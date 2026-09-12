@@ -365,7 +365,7 @@ export class ZenithApp {
    * @param {import('./ui/PositionImporter.js').ImportedPosition} position
    */
   async enterTableWithPosition(position) {
-    const settings = this.startScreen.settings;
+    const settings = { ...this.startScreen.settings, mode: position.mode ?? this.startScreen.settings.mode };
     this.applyLiveSettings(settings);
     const result = this.engine.loadPosition({
       board: position.board ?? undefined,

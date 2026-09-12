@@ -244,6 +244,19 @@ describe('GameState: LOAD_POSITION', () => {
 });
 
 describe('Record: save and parse', () => {
+  it('preserves a setup turn override through export and replay', () => {
+    const engine = new GameEngine({ mode: RuleMode.RENJU });
+    const board = boardWith([[0, 0, BLACK]]);
+    engine.loadPosition({ board, currentPlayer: BLACK }, 1000);
+    engine.selectColor(WHITE, 2000);
+    engine.makeMove(7, 7, 3000);
+    const { record } = parseRecord(JSON.stringify(toRecord(engine.getState())));
+    const restored = new GameEngine();
+    expect(restored.loadPosition({ ...record, config: { mode: record.mode } }, 4000).error).toBeNull();
+    expect(restored.getState().board).toEqual(engine.getState().board);
+    expect(restored.getState().rules.mode).toBe(RuleMode.RENJU);
+    expect(restored.currentPlayer).toBe(WHITE);
+  });
   it('round-trips a restored game through toRecord / parseRecord / LOAD_POSITION', () => {
     const engine = new GameEngine();
     engine.loadPosition({ board: MIDGAME }, 1000);

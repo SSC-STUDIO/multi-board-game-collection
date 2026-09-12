@@ -41,6 +41,7 @@ export function toRecord(state, { now = Date.now() } = {}) {
     moves: state.moves.map((m) => m.notation),
     humanColor: state.humanColor,
     currentPlayer: state.currentPlayer,
+    firstPlayer: state.moves[0]?.player ?? state.currentPlayer,
     status: state.status,
     winner: state.winner,
   };
@@ -101,7 +102,7 @@ export function parseRecord(input, size = 15) {
       moves,
       mode: typeof rec.mode === 'string' ? rec.mode : null,
       humanColor: colour(rec.humanColor),
-      currentPlayer: moves.length === 0 ? colour(rec.currentPlayer) : null,
+      currentPlayer: moves.length === 0 ? colour(rec.currentPlayer) : colour(rec.firstPlayer),
       source: 'record',
     },
   };

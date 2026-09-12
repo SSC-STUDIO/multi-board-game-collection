@@ -321,6 +321,11 @@ export class PositionImporter {
     return this._source != null && this._moves.length === 0;
   }
 
+  get _ruleMode() {
+    const mode = this._source?.record?.mode;
+    return mode === 'STANDARD' || mode === 'RENJU' ? mode : this._mode;
+  }
+
   /** Run the same reducer the table will use, so the verdict can never disagree with the engine. */
   _evaluate() {
     if (!this._board) {
@@ -330,13 +335,13 @@ export class PositionImporter {
     }
     const board = this._board;
     const moves = this._moves;
-    const setupAnalysis = analyzePosition(board, { mode: this._mode });
-    const currentPlayer = moves.length === 0 ? (this._turnOverride ?? this._source?.record?.currentPlayer ?? null) : null;
-    const result = transition(createInitialState({ mode: this._mode }), {
+    const setupAnalysis = analyzePosition(board, { mode: this._ruleMode });
+    const currentPlayer = moves.length === 0 ? (this._turnOverride ?? this._source?.record?.currentPlayer ?? null) : this._source?.record?.currentPlayer;
+    const result = transition(createInitialState({ mode: this._ruleMode }), {
       type: ActionType.LOAD_POSITION, board, moves, currentPlayer: currentPlayer ?? undefined, timestamp: 0,
     });
     const finalBoard = result.error ? board : result.state.board;
-    const analysis = analyzePosition(finalBoard, { mode: this._mode });
+    const analysis = analyzePosition(finalBoard, { mode: this._ruleMode });
     this._evaluation = {
       ok: !result.error,
       error: result.error,
@@ -355,7 +360,8 @@ export class PositionImporter {
     this._onConfirm?.({
       board: this._board,
       moves,
-      currentPlayer: moves.length === 0 ? (this._turnOverride ?? record?.currentPlayer ?? null) : null,
+      currentPlayer: moves.length === 0 ? (this._turnOverride ?? record?.currentPlayer ?? null) : record?.currentPlayer,
+      mode: this._ruleMode,
       humanColor: record?.humanColor ?? null,
       source: this._boardSource,
       counts: this._evaluation.analysis.counts,
@@ -411,6 +417,7 @@ export class PositionImporter {
     const { analysis, setupAnalysis } = ev;
     const c = analysis.counts;
     const lines = [];
+    lines.push(`<p>${this._ruleMode === 'RENJU' ? '连珠禁手' : '标准五子'}${this._source?.record?.mode ? ' · 使用棋谱规则' : ''}</p>`);
     lines.push(`<div class="zt-import__counts"><span class="zt-import__stone zt-import__stone--black"></span> 黑 ${c.black} <span class="zt-import__stone zt-import__stone--white"></span> 白 ${c.white}${ev.moves ? ` · 棋谱 ${ev.moves} 手` : ''}</div>`);
 
     let verdict = '';
