@@ -70,7 +70,8 @@ export const VIEWPOINTS = Object.freeze({
   }),
   // The seated player's own eyes (head centre of LAYOUT.SEAT_NEAR): low enough that the opponent's
   // head and shoulders sit in the top of the frame, wide enough that the near board edge stays clickable.
-  MAIN_PLAY: Object.freeze({ position: [0.0, 13.0, 16.2], target: [0.0, 5.0, -4.0], fov: 56 }),
+  MAIN_PLAY: Object.freeze({ position: [0.0, 13.0, 16.2], target: [0.0, 3.0, -2.0], fov: 62 }),
+  BOARD_STUDY: Object.freeze({ position: [0.0, 19.0, 8.0], target: [0.0, 0.0, 0.8], fov: 52 }),
   CLOCK_FOCUS: Object.freeze({ position: [10.2, 7.8, 6.5], target: [8.5, 2.0, 1.0], fov: 35 }),
   MANUAL_STUDY: Object.freeze({ position: [-7.8, 10.5, 3.2], target: [-6.5, 0.5, -2.0], fov: 32 }),
   LEDGER_REVIEW: Object.freeze({ position: [7.5, 9.2, 8.5], target: [6.0, 0.5, 4.5], fov: 34 }),
@@ -329,7 +330,8 @@ export class CameraDirector {
    * @returns {CameraPose}
    */
   _resolvePose(name, targetOverride) {
-    const vp = this.viewpoints[name];
+    const vp = name === 'MAIN_PLAY' && this.camera.aspect < 0.8
+      ? this.viewpoints.BOARD_STUDY ?? this.viewpoints[name] : this.viewpoints[name];
     if (!vp) throw new Error(`CameraDirector: unknown viewpoint "${name}"`);
 
     const target = targetOverride
@@ -408,8 +410,11 @@ export class CameraDirector {
     const cam = this.camera;
     cam.position.set(position[0], position[1], position[2]);
     cam.lookAt(this._view.target[0], this._view.target[1], this._view.target[2]);
-    if (cam.fov !== base.fov) {
-      cam.fov = base.fov;
+    // Keep a square viewport's horizontal framing on narrow phones.
+    const aspect = Math.max(0.25, Math.min(1, cam.aspect || 1));
+    const fov = Math.min(115, 2 * Math.atan(Math.tan(base.fov * Math.PI / 360) / aspect) * 180 / Math.PI);
+    if (cam.fov !== fov) {
+      cam.fov = fov;
       cam.updateProjectionMatrix();
     }
   }

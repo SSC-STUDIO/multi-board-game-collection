@@ -54,6 +54,8 @@ export class ScoreLedger extends Entity {
     this._writing = null;
     this._pending = 0;
     this._queue = Promise.resolve();
+    this._epoch = 0;
+    this._reviewIndex = null;
     this._flipping = null;
     this._penMode = 'rest';
     this._worldPos = new THREE.Vector3();
@@ -198,19 +200,37 @@ export class ScoreLedger extends Entity {
    */
   writeMove(moveIndex, notation, player) {
     this._pending++;
-    const run = () => this._writeMove(moveIndex, notation, player);
+    const epoch = this._epoch;
+    const run = () => epoch === this._epoch ? this._writeMove(moveIndex, notation, player, epoch) : undefined;
     this._queue = this._queue.then(run, run);
     return this._queue;
   }
 
   /** Replace the whole record without animation and jump to the last page. */
   setMoves(moves) {
+    // Invalidate both active animations and work still waiting in the promise queue.
+    this._epoch++;
+    this.tweens.cancelAll();
+    this._queue = Promise.resolve();
+    this._pending = 0;
+    this._flipping = null;
+    this.flipPivot.visible = false;
+    this._penMode = 'rest';
+    this.pen.position.copy(this._penRestPos);
+    this.pen.quaternion.setFromUnitVectors(UP, REST_DIR);
+    this._reviewIndex = null;
     this._moves = [];
     for (const m of moves ?? []) {
       if (m && Number.isInteger(m.index)) this._moves[m.index] = { index: m.index, notation: m.notation, player: m.player };
     }
     this._writing = null;
     this._page = this.pageCount - 1;
+    this._drawPage();
+  }
+
+  setReviewIndex(index) {
+    this._reviewIndex = index;
+    if (index != null) this._page = Math.min(this.pageCount - 1, Math.floor(Math.max(0, index - 1) / MOVES_PER_PAGE));
     this._drawPage();
   }
 
@@ -251,6 +271,7 @@ export class ScoreLedger extends Entity {
   }
 
   dispose() {
+    this._epoch++;
     this.dyn.dispose();
     super.dispose();
   }
@@ -259,7 +280,7 @@ export class ScoreLedger extends Entity {
   // Internals
   // ---------------------------------------------------------------------------
 
-  async _writeMove(moveIndex, notation, player) {
+  async _writeMove(moveIndex, notation, player, epoch) {
     // Anything recorded after this index is stale (an undo happened).
     if (this._moves.length > moveIndex) this._moves.length = moveIndex;
     this._moves[moveIndex] = { index: moveIndex, notation, player };
@@ -267,6 +288,7 @@ export class ScoreLedger extends Entity {
     const page = Math.floor(moveIndex / MOVES_PER_PAGE);
     if (page !== this._page) await this._flipTo(page);
     else this._drawPage();
+    if (epoch !== this._epoch) return;
 
     const slot = moveIndex % MOVES_PER_PAGE;
     const col = COLS[Math.floor(slot / ROWS)];
@@ -284,6 +306,7 @@ export class ScoreLedger extends Entity {
 
     this._penMode = 'fly';
     await this._flyPen(this._canvasToLocal(writing.startPx, writing.baselinePy - 4, 0.015), WRITE_DIR, 200);
+    if (epoch !== this._epoch) return;
     this.group.getWorldPosition(this._worldPos);
     this.playSound('pen_scribble', this._worldPos);
 
@@ -302,6 +325,7 @@ export class ScoreLedger extends Entity {
         this._drawPage();
       },
     });
+    if (epoch !== this._epoch) return;
     if (this._writing === writing) this._writing = null;
     this._drawPage();
 
@@ -310,6 +334,7 @@ export class ScoreLedger extends Entity {
       this._pending = 0;
       this._penMode = 'fly';
       await this._flyPen(this._penRestPos, REST_DIR, 300);
+      if (epoch !== this._epoch) return;
       this._penMode = 'rest';
     }
   }
@@ -330,8 +355,11 @@ export class ScoreLedger extends Entity {
   }
 
   /** Simplified page turn: one sheet rotates about the spine; content swaps at the midpoint. */
-  _flipTo(target) {
-    if (this._flipping) return this._flipping.then(() => this._flipTo(target));
+  _flipTo(target, epoch = this._epoch) {
+    if (epoch !== this._epoch) return Promise.resolve();
+    if (this._flipping) return this._flipping.then(() => this._flipTo(target, epoch));
+    target = Math.max(0, Math.min(this.pageCount - 1, target));
+    if (target === this._page) return Promise.resolve();
     const forward = target > this._page;
     this.flipPivot.rotation.z = forward ? 0 : Math.PI;
     this.flipPivot.visible = true;
@@ -353,6 +381,7 @@ export class ScoreLedger extends Entity {
         },
       })
       .then(() => {
+        if (epoch !== this._epoch) return;
         if (!swapped) swap();
         this.flipPivot.visible = false;
         this._flipping = null;
@@ -416,6 +445,11 @@ export class ScoreLedger extends Entity {
       const baseline = ROW_TOP + row * ROW_H + ROW_H - 12;
       const progress = this._writing && this._writing.index === idx ? this._writing.progress : 1;
       const color = m.player === 2 ? INK_WHITE : INK_BLACK;
+
+      if (this._reviewIndex === idx + 1) {
+        ctx.fillStyle = '#e6c989';
+        ctx.fillRect(col.x0, ROW_TOP + row * ROW_H, col.x1 - col.x0, ROW_H);
+      }
 
       ctx.globalAlpha = Math.min(1, progress * 3);
       ctx.beginPath();

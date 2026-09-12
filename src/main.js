@@ -30,6 +30,7 @@ import { InteractionManager } from './spatial/picker/InteractionManager.js';
 import { Spotlight } from './spatial/picker/Spotlight.js';
 import { INTERACTIVE, BOARD_TOP_Y, LAYOUT, cellsCenterWorld } from './spatial/Layout.js';
 import { Tabletop } from './spatial/entities/Tabletop.js';
+import { TableConsole } from './spatial/entities/TableConsole.js';
 import { Board } from './spatial/entities/Board.js';
 import { Bowls } from './spatial/entities/Bowls.js';
 import { ChessClock } from './spatial/entities/ChessClock.js';
@@ -115,6 +116,7 @@ export class ZenithApp {
 
     const audio = this.audio;
     this.tabletop = new Tabletop({ audio });
+    this.tableConsole = new TableConsole();
     this.board = new Board({ audio });
     this.bowls = new Bowls({ audio });
     this.clock = new ChessClock({ audio });
@@ -137,7 +139,7 @@ export class ZenithApp {
     this.opponent = new Figure({ audio, seat: LAYOUT.SEAT_FAR, name: 'opponent', palette: { robe: 0x3c4a6b, sash: 0x8a2b2b } });
     this.player = new Figure({ audio, seat: LAYOUT.SEAT_NEAR, name: 'player', palette: { robe: 0x5a4a3a, sash: 0x2f3e2a } });
     this.entities = [
-      this.room, this.tabletop, this.decor, this.board, this.bowls, this.clock,
+      this.room, this.tabletop, this.tableConsole, this.decor, this.board, this.bowls, this.clock,
       this.sandglass, this.manual, this.ledger, this.stamp, this.tray, this.opponent, this.player,
     ];
     for (const entity of this.entities) this.world.add(entity);
@@ -152,6 +154,7 @@ export class ZenithApp {
     this.hintRequest = 0;
     this.seated = false;
     this.menuOpen = false;
+    this.review = null;
     this.pausedByMenu = false;
     /** Per-side thinking time for untimed games (the core only tracks countdowns). */
     this.elapsedMs = { [BLACK]: 0, [WHITE]: 0 };
@@ -367,6 +370,8 @@ export class ZenithApp {
   /** Esc during play: pause quietly (no clock close-up) and show the sheet in menu mode. */
   openMenu() {
     if (this.menuOpen || !this.seated) return;
+    const reviewResume = this.review?.resume ?? false;
+    this.endReview(false);
     this.menuOpen = true;
     this.hintRequest++;
     this.manual.setThinking(false);
@@ -375,8 +380,8 @@ export class ZenithApp {
     this.setInputEnabled(false);
     this.hud.setSuppressed(true);
     const state = this.engine.getState();
-    this.pausedByMenu = state.status === GameStatus.PLAYING;
-    if (this.pausedByMenu) this.engine.togglePause(now());
+    this.pausedByMenu = reviewResume || state.status === GameStatus.PLAYING;
+    if (state.status === GameStatus.PLAYING) this.engine.togglePause(now());
     const inGame = state.status === GameStatus.PLAYING || state.status === GameStatus.PAUSED;
     this.startScreen.setMenuContext({ canResign: inGame && state.moves.length > 0, canSave: state.moves.length > 0 || state.setupBoard !== null });
     this.startScreen.setSettings(this.settings);
@@ -560,6 +565,19 @@ export class ZenithApp {
       return;
     }
     if (!this.seated) return;
+    if (this.review) {
+      const indices = { ArrowLeft: this.review.index - 1, ArrowRight: this.review.index + 1, Home: 0, End: this.engine.moves.length };
+      if (event.key in indices) {
+        event.preventDefault();
+        this.showReviewMove(indices[event.key]);
+        return;
+      }
+      if (event.key === 'Escape' || event.key === ' ') {
+        event.preventDefault();
+        this.endReview();
+        return;
+      }
+    }
     switch (event.key) {
       case 'Escape':
         if (!this.ceremonyBusy) this.openMenu();
@@ -613,6 +631,55 @@ export class ZenithApp {
     this.audio.update();
     this.debugStats?.update(dt);
     this.governQuality(dt);
+    this.syncTableConsole();
+  }
+
+  syncTableConsole() {
+    const s = this.engine.getState();
+    const selecting = s.status === GameStatus.SELECTING;
+    const finished = s.status === GameStatus.FINISHED;
+    const active = s.status === GameStatus.PLAYING || s.status === GameStatus.PAUSED;
+    const action = (id, label, enabled = true) => ({ id, label, enabled });
+    if (this.review) {
+      const i = this.review.index;
+      const move = s.moves[i - 1];
+      this.tableConsole.setState(`复盘 · ${i} / ${s.moves.length} 手`, move ? `${SIDE_NAME[move.player]} ${move.notation} · 淡子为后续着法` : '起始局面 · 淡子为后续着法', [
+        action('first', '起始', i > 0), action('prev', '上一手', i > 0),
+        action('next', '下一手', i < s.moves.length), action('last', '末手', i < s.moves.length),
+        action('exitReview', '返回对局'), action('menu', '设置'),
+      ]);
+      return;
+    }
+    const title = selecting ? '揭罐选边 · 请入局' : finished ? '此局已终 · 可复盘再战'
+      : s.status === GameStatus.PAUSED ? '对局暂停' : this.engine.isAiTurn() ? '对手思考中' : `轮到你 · 执${SIDE_NAME[s.humanColor]}`;
+    const detail = `${s.rules.mode === 'RENJU' ? '连珠禁手' : '标准五子'} · 第 ${s.moves.length} 手`;
+    this.tableConsole.setState(title, detail, [
+      selecting || finished ? action('black', '执黑') : action('pause', s.status === GameStatus.PAUSED ? '继续' : '暂停', active && !this.busy),
+      selecting || finished ? action('white', '执白') : action('undo', '悔棋', s.moves.length > 0 && !this.busy),
+      action('hint', '请教', this.engine.isHumanTurn() && !this.busy),
+      action('review', '棋谱', s.moves.length > 0 && !this.busy),
+      action('view', this.director.current === 'BOARD_STUDY' ? '落座' : '俯览', !this.busy),
+      action('menu', '设置', !this.ceremonyBusy),
+    ]);
+  }
+
+  onTableAction(id) {
+    if (this.menuOpen || this.tutorial.active || this.ceremonyBusy) return;
+    switch (id) {
+      case 'black': this.onBowlClick(BLACK); break;
+      case 'white': this.onBowlClick(WHITE); break;
+      case 'pause': this.onPlungerClick(); break;
+      case 'undo': this.onSandglassClick(); break;
+      case 'hint': this.onManualClick().catch(console.error); break;
+      case 'review': this.beginReview(); break;
+      case 'first': this.showReviewMove(0); break;
+      case 'prev': this.showReviewMove((this.review?.index ?? 1) - 1); break;
+      case 'next': this.showReviewMove((this.review?.index ?? 0) + 1); break;
+      case 'last': this.showReviewMove(this.engine.moves.length); break;
+      case 'exitReview': this.endReview(); break;
+      case 'view': this.focus(this.director.current === 'BOARD_STUDY' ? 'MAIN_PLAY' : 'BOARD_STUDY'); break;
+      case 'menu': this.openMenu(); break;
+    }
   }
 
   /** The player's right hand holds the ledger pen while it writes; heads hide when the camera is inside them. */
@@ -630,6 +697,9 @@ export class ZenithApp {
     for (const figure of [this.player, this.opponent]) {
       const near = figure.getHeadWorldPosition(this._headPos).distanceTo(cam) < 3.2;
       if (figure.head.visible === near) figure.head.visible = !near;
+      // A first-person body must not cover the near board edge or the desk controls.
+      figure.body.visible = !near;
+      figure.legs.visible = !near;
     }
   }
 
@@ -706,6 +776,13 @@ export class ZenithApp {
 
   bindInteractions() {
     const im = this.interactions;
+    im.registerEntity(this.tableConsole, {
+      table_console: {
+        onClick: (hit) => this.onTableAction(this.tableConsole.actionAt(hit.intersection)),
+        onHoverMove: (hit) => this.tableConsole.setHover(this.tableConsole.actionAt(hit.intersection)),
+        onHoverExit: () => this.tableConsole.setHover(null),
+      },
+    });
     im.registerEntity(this.tabletop, {
       [INTERACTIVE.TABLE]: { onClick: () => this.escape() },
     });
@@ -733,10 +810,10 @@ export class ZenithApp {
     });
     im.registerEntity(this.ledger, {
       [INTERACTIVE.LEDGER_PAGE]: {
-        onClick: () => this.focus('LEDGER_REVIEW', 'study'),
+        onClick: (hit) => this.onLedgerClick(hit),
         onHoverEnter: (hit) => this.onLedgerHover(hit),
         onHoverMove: (hit) => this.onLedgerHover(hit),
-        onHoverExit: () => this.board.setGhostStones(null),
+        onHoverExit: () => this.board.setGhostStones(this.review?.index ?? null, this.engine.moves),
       },
       [INTERACTIVE.LEDGER_NEXT]: { onClick: () => this.onLedgerPage(1) },
       [INTERACTIVE.LEDGER_PREV]: { onClick: () => this.onLedgerPage(-1) },
@@ -766,6 +843,7 @@ export class ZenithApp {
 
   /** Escape gesture (spec §3.2): a click on empty table space returns to MAIN_PLAY and undoes any free-look. */
   escape() {
+    this.endReview();
     this.hintRequest++;
     this.manual.setThinking(false);
     this.board.setGhostStones(null);
@@ -795,8 +873,9 @@ export class ZenithApp {
   }
 
   onBoardClick(hit) {
+    if (this.review) { this.endReview(); return; }
     const cell = this.board.pointToCell(hit.point);
-    if (!cell || this.director.current !== 'MAIN_PLAY' || this.engine.status !== GameStatus.PLAYING) {
+    if (!cell || !['MAIN_PLAY', 'BOARD_STUDY'].includes(this.director.current) || this.engine.status !== GameStatus.PLAYING) {
       this.escape();
       return;
     }
@@ -805,7 +884,7 @@ export class ZenithApp {
   }
 
   onBoardHover(hit) {
-    const canPlay = this.engine.isHumanTurn() && !this.busy && this.director.current === 'MAIN_PLAY' && !this.orbitInput.isDragging;
+    const canPlay = this.engine.isHumanTurn() && !this.busy && ['MAIN_PLAY', 'BOARD_STUDY'].includes(this.director.current) && !this.orbitInput.isDragging;
     this.board.setHover(canPlay ? this.board.pointToCell(hit.point) : null, this.engine.getState().humanColor ?? BLACK);
   }
 
@@ -816,6 +895,7 @@ export class ZenithApp {
   }
 
   onSandglassClick() {
+    this.endReview();
     const state = this.engine.getState();
     if (this.busy || this.sandglass.busy || state.status === GameStatus.SELECTING || state.moves.length === 0) return;
     this.cancelAi();
@@ -848,10 +928,55 @@ export class ZenithApp {
   onLedgerHover(hit) {
     if (this.director.current !== 'LEDGER_REVIEW') return;
     const index = this.ledger.hitToMoveIndex(hit.intersection);
-    this.board.setGhostStones(index == null ? null : index + 1, this.engine.getState().moves);
+    this.board.setGhostStones(index == null ? this.review?.index ?? null : index + 1, this.engine.getState().moves);
+  }
+
+  beginReview(viewpoint = 'BOARD_STUDY') {
+    const state = this.engine.getState();
+    if (this.busy || state.moves.length === 0 || this.menuOpen) return;
+    if (!this.review) {
+      this.review = { index: state.moves.length, resume: state.status === GameStatus.PLAYING };
+      this.hintRequest++;
+      this.manual.setThinking(false);
+      this.cancelAi();
+      for (const key of [...this.carrying.keys()]) this.landStone(key, { immediate: true });
+      this.ledger.setMoves(state.moves);
+      if (this.review.resume) this.engine.togglePause(now());
+    }
+    this.showReviewMove(this.review.index);
+    this.focus(viewpoint, 'study');
+  }
+
+  showReviewMove(index) {
+    if (!this.review) return;
+    this.review.index = Math.max(0, Math.min(this.engine.moves.length, index));
+    this.board.setGhostStones(this.review.index, this.engine.moves);
+    this.ledger.setReviewIndex(this.review.index);
+  }
+
+  endReview(resume = true) {
+    if (!this.review) return;
+    const shouldResume = this.review.resume;
+    this.review = null;
+    this.board.setGhostStones(null);
+    this.ledger.setReviewIndex(null);
+    if (resume && shouldResume && this.engine.status === GameStatus.PAUSED) this.engine.togglePause(now());
+    if (resume) {
+      this.director.returnToMain();
+      this.lighting.setMood(this.moodForStatus());
+    }
+  }
+
+  onLedgerClick(hit) {
+    if (this.director.current !== 'LEDGER_REVIEW') { this.beginReview('LEDGER_REVIEW'); return; }
+    const index = this.ledger.hitToMoveIndex(hit.intersection);
+    if (index == null) return;
+    this.beginReview();
+    this.showReviewMove(index + 1);
   }
 
   onLedgerPage(direction) {
+    if (!this.review) this.beginReview('LEDGER_REVIEW');
     if (this.director.current !== 'LEDGER_REVIEW') this.focus('LEDGER_REVIEW', 'study');
     (direction > 0 ? this.ledger.nextPage() : this.ledger.prevPage()).catch(console.error);
   }
@@ -872,6 +997,7 @@ export class ZenithApp {
   }
 
   onGameReset() {
+    this.endReview(false);
     this.cancelAi();
     this.cancelCarries();
     this.hintRequest++;
@@ -952,7 +1078,7 @@ export class ZenithApp {
     if (paused) {
       this.cancelAi();
       // The Esc menu pauses too, but keeps the camera where the player left it.
-      if (!this.menuOpen) this.director.goTo('CLOCK_FOCUS', { duration: 650 });
+      if (!this.menuOpen && !this.review) this.director.goTo('CLOCK_FOCUS', { duration: 650 });
     } else {
       if (!this.menuOpen) this.director.returnToMain();
       this.scheduleAi();

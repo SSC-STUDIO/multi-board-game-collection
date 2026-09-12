@@ -152,8 +152,8 @@ describe('CameraDirector', () => {
     expect(director.isTransitioning).toBe(false);
     expect(director.getPose()).toEqual({
       position: [0, 13, 16.2],
-      target: [0, 5, -4],
-      fov: 56,
+      target: [0, 3, -2],
+      fov: 62,
     });
   });
 
