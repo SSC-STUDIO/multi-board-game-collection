@@ -1,213 +1,213 @@
-﻿<div align="center">
+# 🌌 Zenith-Tabletop-3D (巅峰 3D 拟真棋道空间)
 
-# 🎮 Board Games 合集 / Multi-Board Game Collection
-
-**五子棋 & 围棋 • Three.js 3D 对弈桌面 • LLM AI 教练 • 跨平台**
-
-[![Demo](https://img.shields.io/badge/Live-Demo-black?logo=githubpages&logoColor=white)](https://ssc-studio.github.io/Multi-Board-Game-Collection/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-1.0.0-orange.svg)](version.json)
-[![Tests](https://img.shields.io/badge/Tests-821%20passing-brightgreen.svg)]()
-[![3D](https://img.shields.io/badge/Three.js-3D%20Rendering-blueviolet.svg)](https://threejs.org/)
-
-[English](#english) | [简体中文](#简体中文)
-
-<img src="assets/screenshots/screenshot_01.png" alt="游戏截图" width="600"/>
-
-</div>
+> **下一代空间拟真棋类对弈平台**  
+> 告别 2D 扁平悬浮按钮与遮罩弹窗，将所有交互系统全面物化为真实 3D 桌面世界中的物理道具。
 
 ---
 
-## 简体中文
+## 🌟 核心革新理念：Diegetic In-World UI (拟真实体化 UI)
 
-### 游戏简介
+在传统 Web 3D 游戏中，3D 往往只是一个背景板，上面糊着一层密密麻麻的 2D HTML 按钮（暂停、重开、悔棋、步数、设置）。这种“油水分离”的设计彻底扼杀了沉浸感。
 
-本项目是五子棋与围棋的合集：从统一的 3D 启动器进入游戏，每款棋拥有独立的规则引擎与应用模块，共享同一套 Three.js 桌面布景。
+**Zenith-Tabletop-3D** 的核心突破是：**桌案上的每一个物体，都是一个功能界面**。
 
-- **五子棋 (Gomoku)** — 15×15 连五即胜，支持禁手规则（三三、四四、长连）、三档 AI 难度与 QI 指导
-- **围棋 (Go)** — 9/13/19 路棋盘，中国规则与日本规则计分，支持让子、形势判断与 AI 对弈
+| 功能模块 | 传统 2D 方案 | **Zenith 3D 实体化方案** | 物理交互与动态表现 |
+| :--- | :--- | :--- | :--- |
+| **暂停游戏 (Pause)** | 顶部浮层按钮 / 遮罩弹窗 | **桌边双面机械对局钟** | 点击时钟侧边黄铜机械制动扳手，发出沉闷脆响；指针定格，镜头微推特写，对局静止。再次点击恢复。 |
+| **对局计时 (Clock)** | 屏幕文字数字 `05:00` | **动态 Canvas 指针表盘** | 表盘秒针毫秒级平滑转动，落子后顶部金属杠杆自动按落，切换思考方。 |
+| **悔棋回溯 (Undo)** | 底部扁平按钮 | **桌旁回溯黄铜沙漏** | 点击沙漏，沙漏 180° 翻转，沙粒反向回流；刚才落下的棋子升空滑翔飞回棋罐。 |
+| **AI 提示 (Hint / Coach)** | 弹出 Toast 提示框 | **宣纸线装棋谱古籍** | 点击古籍，镜头俯冲，毛笔自动在宣纸上绘制水墨推荐点与战术批注；盘面升起青烟微光。 |
+| **行棋记录 (Move History)** | 侧边栏长列表文字 | **皮质记谱册与墨水笔** | 每步落子钢笔在纸上手写记录，点击本子可自由翻页查看，棋盘投影出历史残影。 |
+| **执子选边 (Color Select)** | 单选框表单 | **天然原木双色棋笥** | 点击黑胡桃木棋罐或白蜡木棋罐开盖，盖子移至一旁作为吃子台，即代表选定该方。 |
+| **终局胜负 (Victory)** | 全屏结果弹窗 | **朱砂兽钮青田石印章** | 终局时镜头拉起俯瞰，巨石印章凌空下落，在卷轴上沉重盖下朱红大印（“大捷”或“惜败”）。 |
 
-### 核心特性
+---
 
-- **统一启动器** — 一键切换游戏，模块按需懒加载
-- **多种模式** — 人人对战、人机对战（三档难度）、练习模式
-- **3D 对弈桌面** — 共用桌面布景，家 / 公园 / 比赛三种氛围（光照、雾、相机、色调），IBL 环境光照提升棋子质感
-- **LLM AI 教练** — 可选接入外部 LLM API，落子建议、风险提示与终局复盘
-- **实用辅助** — 悔棋、提示、换边、认输、完整棋谱记录
-- **音效** — Web Audio 落子音效与方向性声像定位
-- **双语界面** — 简体中文 / English 完整覆盖
+## 🎥 空间镜头导演系统 (Spatial Camera Director)
 
-### 项目结构
+本项目彻底杜绝“页面弹窗与遮罩层”，一切功能与状态切换均由**平滑镜头调度 (Hermite / Slerp Interpolation)** 驱动：
 
-```text
-.
-├── index.html              # 主入口（启动器）
-├── sw.js                   # PWA Service Worker
-├── electron-main.js        # Electron 主进程（唯一入口）
-├── capacitor.config.json   # Capacitor Android 配置
-├── android/                # Android 原生工程
-├── src/
-│   ├── main.js             # 应用入口，启动器初始化
-│   ├── app/                # 跨游戏应用壳（BoardGameApp + 共享控制器）
-│   ├── games/              # 各游戏自洽模块（逻辑 + 应用 + 3D 渲染器）
-│   │   ├── registry.js     # 游戏注册表（懒加载）
-│   │   ├── gomoku/         # 五子棋（GomokuApp/state/rules/ai/controllers/render3d）
-│   │   └── go/             # 围棋（GoApp/state/rules/ai/scoring/render3d）
-│   ├── render3d/           # 共享 3D 引擎（Three.js，含 scenes/tabletop.js）
-│   ├── ui/                 # 表现层
-│   ├── utils/              # 工具层（i18n、棋盘坐标等）
-│   ├── config/             # 配置层
-│   ├── audio/              # 音效
-│   ├── services/           # 服务（LLM Coach、AI 解说、棋盘识图）
-│   ├── locales/            # 本地化文件（zh/en）
-│   └── styles/             # 样式文件
-├── steam/                  # Steam 配置
-├── tools/                  # 构建工具脚本
-└── docs/                   # 文档（docs/notes/ 存放开发笔记）
+- **对弈主视角**：玩家落座后的第一人称视角（镜头就在近侧人物的头部）——略俯视全盘，画面顶部能看到对面棋手的头与肩，自己的手臂会从画面下方伸出取子、落子、写字；
+- **时钟调校视角**：点击对局钟，镜头顺滑推近特写，调整规则或按下暂停；
+- **研读古籍视角**：点击线装书，镜头旋转俯拍宣纸，细品 AI 评语；
+- **记谱本回溯视角**：推向右侧笔记本，翻页回溯历史；
+- **点击任意空白桌面区域，镜头无感拉回主对弈视角**，无眩晕、无割裂。
+
+---
+
+## 🏗️ 架构分层 (Four-Tier Decoupled Architecture)
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                            1. 表现与空间交互层 (Spatial Layer)              │
+│   ┌──────────────────────┐  ┌──────────────────────┐  ┌──────────────────┐  │
+│   │ 3D 实体组 (Entities) │  │ 镜头导演 (CameraDir) │  │ 空间拾取(Picker) │  │
+│   │ (Table/Clock/Manual) │  │ (Orbit/Focus/Shake)  │  │ (Raycast/Hover)  │  │
+│   └──────────────────────┘  └──────────────────────┘  └──────────────────┘  │
+└──────────────────────────────────────┬──────────────────────────────────────┘
+                                       ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                            2. 实体控制器层 (Controller Layer)               │
+│   ┌──────────────────────┐  ┌──────────────────────┐  ┌──────────────────┐  │
+│   │ ClockController      │  │ ManualController     │  │ BoardController  │  │
+│   │ (驱动指针/暂停制动)  │  │ (驱动古籍翻页/水墨)  │  │ (落子/弹跳/震动) │  │
+│   └──────────────────────┘  └──────────────────────┘  └──────────────────┘  │
+└──────────────────────────────────────┬──────────────────────────────────────┘
+                                       ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                            3. 纯业务规则与状态机 (Domain Core)              │
+│   ┌─────────────────────────────────────────────────────────────────────┐   │
+│   │ GameEngine (纯 JavaScript，零 DOM，零 Three.js，不可变状态快照)      │   │
+│   │   - 规则判定 (五子/禁手/围棋算地)                                   │   │
+│   │   - 算法搜索 (启发式/Minimax/AlphaBeta)                             │   │
+│   └─────────────────────────────────────────────────────────────────────┘   │
+└──────────────────────────────────────┬──────────────────────────────────────┘
+                                       ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                            4. 基础设施与服务层 (Infrastructure)             │
+│   ┌──────────────────────┐  ┌──────────────────────┐  ┌──────────────────┐  │
+│   │ SpatialAudio (3D音场)│  │ LLMService (导师服务)│  │ DynamicTexture   │  │
+│   └──────────────────────┘  └──────────────────────┘  └──────────────────┘  │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### 快速开始
+---
 
-#### Web 版本
+## 📁 核心设计与计划文档
+
+- 📘 [项目完整开发计划与工程路线图 (DEVELOPMENT_PLAN.md)](docs/DEVELOPMENT_PLAN.md)
+- 📐 [3D 拟真实体 UI 规格与动效规范 (DIEGETIC_UI_SPEC.md)](docs/DIEGETIC_UI_SPEC.md)
+
+---
+
+## 🚀 快速开始
 
 ```bash
-git clone https://github.com/SSC-STUDIO/Multi-Board-Game-Collection.git
-cd Multi-Board-Game-Collection
+# 安装轻量依赖（Three.js / Vite / Vitest）
 npm install
+
+# 可选但推荐：下载 CC0 实拍贴图 / 扫描模型 / HDRI 与 OFL 书法字体（约 50 MB，见"资产说明"）
+npm run assets
+
+# 方式一：零依赖静态服务（自动注入 three 的 import map）→ http://localhost:8080
 npm run serve
-# 浏览器访问 http://localhost:4173
+
+# 方式二：Vite 开发服务器（HMR）→ http://localhost:5173
+npm run dev
+
+# 生产构建 / 预览
+npm run build && npm run preview
+
+# 纯 Node 单测：规则 / 禁手 / 状态不可变性 / AI 搜索 / 镜头插值 / 局面复原 / 图像识别
+npm test
+
+# 无头 Chrome 冒烟测试：开始界面→新手指导→选边→落子→自由视角→Esc 菜单→暂停→悔棋→提示→记谱→终局盖印→底部再战提示→图片复原棋局→AI 续下，截图输出到 _tmp_smoke/
+npm run smoke
 ```
 
-#### Android APK
+### 开始界面与设置
 
-```bash
-npm install
-npm run android:build:debug
-```
+打开页面先看到一张宣纸质感的开始界面，背景是桌案的慢速环绕片头镜头。可以设置 **规则**（标准五子 / 连珠禁手）、**每方用时**（不计时 / 5 / 10 / 20 分）、**对手棋力**（入门 → 宗师，对应搜索深度 2–5）、**画质**（自动 / 精致 / 流畅）与 **音效**，设置保存在浏览器本地。点 **入座对弈** 后界面淡出并从 DOM 中移除，镜头飞入对弈主视角——对局过程中屏幕上只有 WebGL 画布。对弈中按 **Esc** 会安静地暂停并唤出同一张设置页（继续对弈 / 新对局 / 保存棋谱 / 复原棋局 / 认输 / 新手指导）。标题下方会显示你与 AI 的累计战绩。
 
-可直接安装的 APK 输出到 `output/android/BoardGames-1.0.0-debug.apk`，原始 Gradle 产物在 `android/app/build/outputs/apk/debug/app-debug.apk`。LLM 本地服务地址说明见 [Android APK 文档](docs/ANDROID.md)。
+### 对面的棋手与你的双手
 
-#### 桌面版本 (Electron)
+桌旁坐着两个人：对面是 AI 对手，近侧是你自己——对弈主视角的镜头就放在你这个人物的头部，所以你看不到自己的头，但会看到自己的手臂从画面下方伸出。两个人物都是程序化生成的着袍棋手（发髻、束带、交领、可动的三段式手臂与半握的手掌），每人只有 10 个网格、不用蒙皮，手臂由解析式双骨 IK（`src/utils/IK.js`）驱动，伸得远时上身会自然前倾。真人的动作都在：
 
-```bash
-npm run start        # 开发模式
-npm run build:win    # 构建 Windows 版本
-npm run build:linux  # 构建 Linux 版本
-```
+- **取子落子**：轮到谁，谁的手就伸进自己的棋罐（你执黑用左手从左侧黑罐取，执白用右手从右侧白罐取；AI 从身旁的漆碟里取），指间夹着一枚棋子举到交点上方松手，棋子才真正落下。引擎先落子、手再送到，所以规则判定与动画互不干扰；连续快速落子时上一枚会立即落定，不会丢子。
+- **沉思**：AI 搜索期间，对手俯身看棋盘，右手悬在棋碟上方；轮到你时它抬头看着你。
+- **记谱**：钢笔在记谱册上写字时，你的右手会握着笔一路跟随。
+- **终局行礼**：印章盖下、底部提示出现后，对手向你欠身一礼（和局时点头）。
+- **呼吸与微动**：胸腔起伏、头部慢慢转向注视点，静止时也像活人。
 
-### 开发相关
+镜头离任何人物的头部不到 3.2 个单位时，那颗头（含颈）会隐藏，避免穿模；片头环绕镜头里能完整看到两人相对而坐。
 
-- **前端**: 原生 JavaScript (ES Modules)
-- **样式**: 原生 CSS (CSS Variables)
-- **3D 渲染**: Three.js ^0.164.0
-- **测试**: Vitest（821 个测试 / 34 个文件）
-- **打包**: Capacitor (Android)、Electron (桌面)
+### 新手指导
 
-```bash
-npm run serve   # 开发服务器
-npm run check   # 代码检查
-npm test        # 运行测试
-npm run build   # 构建 Web 版本
-```
+第一次入座会自动开始一段约一分钟的**导览**：镜头依次飞到对面的棋手、棋罐、棋盘、对局钟、沙漏、古籍、记谱册与印章，被讲解的器物泛起暖金色微光，屏幕底部的宣纸卡片说明它的用法（上一步 / 下一步 / 跳过，也可用 ← → Enter Esc）。导览看过一次后不再自动出现，随时可从开始界面或 Esc 菜单的「新手指导」重看；对局中途启动时会先暂停，看完自动恢复。
 
-详细开发文档请查看 [开发者指南](docs/DEVELOPER_GUIDE.md)。
+### 终局与再来一局
 
-### 更新日志
+印章盖下之后，屏幕底部会出现三张提示：左下角「执黑再战 → 揭开左侧黑胡桃木棋罐」、右下角「执白再战 → 揭开右侧白蜡木棋罐」（两只棋罐就在棋盘左右两侧），中间一张写明结果与原因（五子连珠 / 超时 / 禁手 / 认输 / 和局），并附一个「同执黑（白）再来一局」按钮。点沙漏可以收回最后一手复盘，Esc 可保存棋谱。提示在新一局开始时自动消失。
 
-查看 [CHANGELOG.md](CHANGELOG.md) 了解详细的版本更新历史。
+### 复原棋局：从一张图片继续下
 
-### 贡献指南
+开始界面和 Esc 菜单里的 **复原棋局** 可以把一盘下到一半的棋搬到 3D 棋案上继续：
 
-欢迎所有形式的贡献！请查看 [CONTRIBUTING.md](CONTRIBUTING.md) 了解如何报告 Bug、提出建议、改进文档与贡献代码。
+1. 选择（或拖入、Ctrl+V 粘贴）一张棋盘照片 / 截图，或本站导出的棋谱 `.json`，或 15 行 `X / O / .` 文本局面。
+2. **本地自动识别**（无需联网）：按灰度暗线的列 / 行投影自相关求出网格周期，再拟合 15 条线的梳状模板并做亚像素细化得到四个角点；每个交点取小圆盘的高分位颜色与相邻格心（必为空木纹）比较，色差或饱和度差大者为棋子，再按明暗分黑白。识别结果直接叠画在图片上：青色网格、黑白圆点，虚线橙圈表示低置信度。
+3. 网格没对准（例如带透视的手机照片）时，拖动四个橙色角点对准棋盘最外侧的四个交点，会按单应变换重新采样；点任意交点可在 空 → 黑 → 白 之间切换修正；「旋转 90°」处理横拍照片。
+4. 若配置了 `window.ZENITH_CONFIG.llm`（见下文），还可以点「云端识图」把图片交给视觉大模型转写为文本局面，再本地核对。
+5. 面板会按子数推断轮到哪一方（黑 = 白 → 黑先，黑 = 白 + 1 → 白先，否则提示子数异常并允许手动指定），并用与引擎完全相同的规则判断局面是否还能继续：任一方已成五连、双方都成五、棋盘已满都会明确说明且不允许继续；连珠规则下黑方长连按禁手处理。
+6. 点 **在 3D 棋案上继续这盘棋**：棋子直接落定在棋盘上，底部提示轮到哪一方；揭开黑罐或白罐选择你执的颜色，另一方由 AI 接手——若轮到 AI，它会立刻思考并落子。此后悔棋只收回新下的手数，记谱册从第 1 手重新记录。
 
-### 许可证
+### 桌面操作一览（全部在 3D 世界内完成）
 
-本项目采用 [MIT License](LICENSE) 开源协议，保留原始版权声明即可自由使用、修改与分发。
+| 想做什么 | 怎么做 |
+| :--- | :--- |
+| 执黑 / 执白开局（终局后再点即开新局） | 点黑胡桃木棋罐 / 白蜡木棋罐 |
+| 落子 | 点棋盘交点（悬停有半透明预览子） |
+| 暂停 / 恢复 | 点对局钟侧边黄铜扳手（钟体本身 = 仅推近查看），或按空格 |
+| 悔棋（人机对弈时会连带收回 AI 的应手） | 点黄铜沙漏，或按 Z |
+| AI 棋道导师提示 | 点线装古籍（毛笔水墨书写推荐点与批注，棋盘升起青烟标记），或按 H |
+| 翻看记谱 / 历史残影 | 点皮质记谱册（页角翻页，悬停某一手即在棋盘投影当时局面） |
+| 自由环视 / 推拉 | 按住鼠标拖动环绕当前注视点，滚轮推拉；触屏单指旋转、双指缩放 |
+| 从任何特写或自由视角回正 | 点击桌面空白处 |
+| 打开设置 / 保存棋谱 / 认输 / 复原棋局 / 新手指导 | Esc |
 
----
+### 棋谱文件
 
-## English
+Esc 菜单的 **保存棋谱** 会下载一份很小的 JSON（`app: "zenith-tabletop-3d"`）：规则、复原时的初始局面（若有，15 行文本）、之后的每一手代数记法、执子颜色与当前轮次。把它拖回「复原棋局」即可原样重现——初始局面与手数都会恢复，记谱册和沙漏悔棋照常可用。
 
-### About
+### URL 参数（覆盖本次访问的已保存设置）
 
-A two-game board game collection: Gomoku and Go, entered from a unified 3D launcher. Each game ships its own rules engine and app module while sharing one Three.js tabletop environment.
+| 参数 | 说明 |
+| :--- | :--- |
+| `?mode=renju` | 启用连珠禁手规则（黑方三三 / 四四 / 长连判负，黑须恰五） |
+| `?time=300` | 每方用时（秒），会吸附到最近的预设档 |
+| `?depth=4` | AI 搜索深度 2–5 |
+| `?quality=low` | 强制“流畅”档，用于弱 GPU 或无头测试 |
+| `?debug=1` | 左上角显示帧率 / draw call / 分辨率 / GPU 诊断信息 |
 
-- **Gomoku (Five in a Row)** — 15×15 board, Renju forbidden moves (3-3, 4-4, overline), three AI levels, QI coaching mode
-- **Go (Weiqi/Baduk)** — 9/13/19 boards, Chinese and Japanese scoring, handicap stones, AI opponents
+### 性能与诊断
 
-### Games at a Glance
+- 画质三档：**精致** = 软阴影 2048、IBL 环境反射、灯笼点光源、约 520 万像素预算（1440p 原生，4K 约 0.8 倍后放大），并走完整后处理链：4× MSAA 半浮点 HDR 缓冲 + SMAA 双重抗锯齿、半分辨率泛光（只让灯笼、窗光和高光溢出）、并入输出通道的暗角；**自动** 在独显上 = 同样的后处理但只用 SMAA（多重采样 HDR 缓冲是整条链里最贵的一项）、约 370 万像素预算；**流畅** = PCF 阴影 1024、关闭灯笼点光源、墙面/地板改用 Lambert 着色跳过 IBL、不走后处理链而用画布自带的 4× MSAA、约 210 万像素预算。渲染分辨率始终受像素预算限制，2K/4K 高分屏不会静默地把 GPU 负载翻四倍。
+- 「自动」的判定除了核数 / 内存 / 触屏，还会读一次 WebGL 的显卡名：Intel UHD/Iris、Mali、Adreno、SwiftShader 等集显或软件渲染直接归入流畅（实测集显上每一遍全屏后处理就要 5 ms，4× MSAA HDR 缓冲要 20 ms 以上）。入座后若连续 3 秒平均帧时间超过 40 ms，自动档还会再降到流畅并在控制台说明；手动选择的精致 / 流畅不会被改动。
+- 沙漏玻璃与印章不再使用真实折射（`transmission`）：three.js 的折射会把整个场景每帧多渲染一遍并生成 mipmap，实测在集显上占 18 ms/帧；现在用清漆透明材质近似，`Sandglass.setTransmission(true)` 可随时开回。
+- **动态分辨率**：渲染循环按真实帧间隔维护一条平滑帧时间曲线（`src/utils/FrameTimeController.js`，纯逻辑、有单测）。连续 0.75 秒超出预算（60 fps 档约 17.5 ms）就把渲染缩放降 0.1（最低 0.6，即像素数约 36%），连续 3 秒低于预算的 70% 再升回去；两个阈值之间是死区，所以不会每秒来回抖动；切换画质档会清零重新预热，切换后的前 60 帧（着色器编译）不计入。每次变动在控制台打印 `[zenith] resolution scale → 0.8 (avg 21.3 ms)`。关闭：`zenith.world.adaptiveResolution = false`；手动指定：`zenith.world.setResolutionScale(0.8)`。
+- **空闲降频**：8 秒没有鼠标 / 滚轮 / 键盘 / 触摸输入时，循环把渲染限制到 30 fps（跳过 rAF 帧，时间照常流逝，动画不变慢），任何输入立即恢复满帧——笔记本挂着不动时 GPU 负载与功耗直接减半。关闭：`zenith.world.idleFpsCap = 0`。`?debug=1` 的左上角会显示当前缩放、平滑帧时间和 idle 标记。
+- 主光方向固定，阴影贴图只在有实体动画（补间进行中）时逐帧重绘，静止时每 8 帧刷新一次。
+- AI 搜索在 Web Worker 中运行，落子思考不会卡住画面；已落定的棋子用 `InstancedMesh` 批量绘制（每色一次 draw call），静态道具的同材质零件已合并；两个人物各只有 10 个网格（躯干、腿、头颈、双臂各三段），不用蒙皮，IK 与呼吸在每帧无内存分配地更新。
+- 打开 `http://localhost:5173/?debug=1` 会在左上角显示帧率、帧时间、draw call、渲染分辨率与浏览器实际使用的 GPU。如果这里显示的是 Intel/AMD 集成显卡而不是独显，请在 Windows「图形设置」里把浏览器设为“高性能”，或在浏览器 `chrome://gpu` 中确认。控制台启动时也会打印同样的 GPU 信息。
+- `npm run perf` 用真实 GPU 的无头 Chrome 测帧率，并逐项开关后处理链（整体 / MSAA / 泛光 / SMAA / 暗角）、阴影 / IBL / 点光源 / 像素比等打印每项耗时，同时把各视点的高画质截图输出到 `_tmp_perf/`（`--quality low`、`--tonemap neutral|agx`、`--shots-only` 可选）。
 
-| Game | Board | Rules | 3D | AI Levels | LLM Coach |
-|------|-------|-------|:---:|:---------:|:---------:|
-| **Gomoku** | 15×15 | Renju + forbidden moves | ✅ | 3 | ✅ |
-| **Go** | 9/13/19 | Chinese + Japanese scoring | ✅ | 3 | ✅ |
+### 光照与材质
 
-### Key Features
+主光为暖白平行光（唯一投影光源）+ 棋盘正上方一盏聚光“读书灯”形成明暗中心，窗侧一束冷色补光，半球光只留一丝反弹；环境反射默认用自建的暗调书房环境图（暖顶光、冷窗光、灯笼暖点）而不是 three.js 默认的白色影棚 `RoomEnvironment`，并以 0.55 的强度施加——之前整体发灰、木纹发白就是白色影棚环境把所有阴影抬亮、把颜色洗淡造成的。下载了资产后，环境图换成 Poly Haven 的实拍 HDRI `pine_attic`（暖木阁楼），经 PMREM 预滤波后以 0.55 倍强度施加，棋子、黄铜、漆面上的反射来自真实光照分布。色调映射保留 ACES（对比过 Khronos Neutral，画面更平更橙）。
 
-- **Unified launcher** — switch games with one click, modules lazy-loaded on demand
-- **Game modes** — Player vs Player, Player vs AI (3 difficulty levels), Practice
-- **Shared 3D tabletop** — one tabletop environment with three moods (Home / Park / Competition: lighting, fog, camera, tone) plus image-based lighting (IBL) for richer PBR reflections
-- **LLM AI Coach** — optional external LLM API for move advice, risk hints, and post-game review
-- **Assistance** — undo, hint, swap sides, resign, full move history
-- **Audio** — Web Audio piece-drop SFX with directional panning
-- **Fully bilingual** — complete English & Simplified Chinese
+### 抗锯齿
 
-### AI Engines
+几何边缘靠多重采样：精致档在后处理链自己的 4× MSAA HDR 缓冲里渲染，流畅档用画布上下文自带的 4× MSAA。木纹高光的闪烁、棋盘格线这类着色锯齿 MSAA 管不到，所以精致 / 自动档在色调映射之后再跑一遍 SMAA（在显示空间做边缘检测，符合其设计），两者叠加后静止与转镜头时都没有爬行锯齿。后处理链的每一遍都以填充率计价，因此暗角没有单独成 pass，而是改写进 three 的 `OutputPass` 着色器里；泛光以半分辨率输入、mip 链从四分之一分辨率开始。
 
-| Game | Easy | Medium | Hard |
-|------|------|--------|------|
-| **Gomoku** | Random top-6 | Minimax depth 2 | Adaptive depth 2-4 + opening book |
-| **Go** | Random top-6 | Random top-3 | 2-ply minimax + Monte Carlo territory eval + transposition table |
+### 可选：接入大模型棋道导师与云端识图
 
-### Quick Start
+在加载 `src/main.js` 之前设置 `window.ZENITH_CONFIG = { llm: { endpoint, apiKey, model, visionModel } }`（OpenAI 兼容的 `/v1/chat/completions`），古籍批注将由大模型润色；推荐着法始终来自本地 Alpha-Beta 引擎，网络失败时自动回退到本地文言短评。配置后「复原棋局」面板会多出「云端识图」按钮，把图片（JPEG data URL）连同提示词发给 `visionModel`（缺省用 `model`），要求其回复 15 行 `X / O / .` 文本；解析结果会替换本地识别，仍可在图上逐点修正。本地识别不依赖任何网络。
 
-```bash
-git clone https://github.com/SSC-STUDIO/Multi-Board-Game-Collection.git
-cd Multi-Board-Game-Collection
-npm install
-npm run serve
-# Visit http://localhost:4173
-```
+### 资产说明
 
-Android: `npm run android:build:debug` (APK at `output/android/BoardGames-1.0.0-debug.apk`, see [Android docs](docs/ANDROID.md)).
-Desktop: `npm run start` for development, `npm run build:win` / `npm run build:linux` for packages.
+仓库本身不含二进制资产：所有木纹、宣纸、皮革、黄铜、青田石纹理都能由 `src/utils/ProceduralTextures.js` 在启动时程序化生成，全部音效由 `src/services/Audio3D.js` 用 Web Audio 实时合成，离线也能完整运行。
 
-### Development
+`npm run assets`（`tools/fetch-assets.mjs`，零依赖）会按 `tools/assets.manifest.json` 从 [Poly Haven](https://polyhaven.com)（CC0）与 Google Fonts（SIL OFL 1.1）下载约 50 MB 素材到 `public/assets/`（已加入 `.gitignore`），并生成 `public/assets/manifest.json`；`src/services/AssetLibrary.js` 启动时读取该清单，素材陆续到达后热替换到对应材质上，缺哪一项就保留哪一项的程序化版本：
 
-- **Frontend**: Vanilla JavaScript (ES Modules)
-- **Styling**: Vanilla CSS (CSS Variables)
-- **3D Rendering**: Three.js ^0.164.0
-- **Testing**: Vitest — 821 tests across 34 files
-- **Packaging**: Capacitor (Android), Electron (Desktop)
+| 用途 | 素材 | 说明 |
+| --- | --- | --- |
+| 棋盘 | `red_oak_veneer` 2K | 直纹橡木饰面调成榧木蜜色；格线、星位、坐标重新绘制在实拍图上，法线 / 粗糙度取自同一套贴图 |
+| 桌面、桌腿、护墙板 | `black_walnut_veneer_01` 2K | 深色胡桃木，桌面 3×2.1 平铺 |
+| 地板 / 地垫 | `dark_wooden_planks`、`hessian_380` | 旧木地板与麻织地垫 |
+| 对局钟 / 记谱册 / 坐垫 | `rosewood_veneer1`、`brown_leather`、`velour_velvet` | 花梨木、棕色皮革、天鹅绒（坐垫仅在未下载坐凳模型时使用） |
+| 扫描模型 | `chinese_stool`×2、`chinese_tea_table` + `tea_set_01`、`antique_ceramic_vase_01`、`potted_plant_01` | 明式坐凳替代程序化坐凳，茶几与青花茶具放在桌案右侧，青花瓶与盆栽落地；对应的程序化茶具 / 盆景自动省略 |
+| 环境 | `pine_attic` 1K HDRI（另备 `fireplace`） | 实拍环境反射 |
+| 字体 | Ma Shan Zheng（楷 / 行）、Zhi Mang Xing（草） | 古籍批注、开始界面用马善政体，卷轴与楹联用志莽行书；OFL 许可文本随字体一并下载 |
 
-```bash
-npm run serve   # dev server
-npm run check   # module syntax check
-npm test        # run tests
-npm run build   # build web bundle
-```
+贴图统一用 Poly Haven 的 `diff / nor_gl / arm` 三张：ARM 把 AO、粗糙度、金属度分别放在 R / G / B 通道，正好对应 three.js `roughnessMap` / `metalnessMap` 读取的通道，无需再打包。所有素材的来源与许可列在生成的 `public/assets/manifest.json` 的 `credits` 字段里。
 
-### Roadmap
-
-- [ ] Re-expand the collection (Chess, Xiangqi, Junqi, Shogi, Othello, ...)
-- [ ] Online multiplayer via WebSockets
-- [ ] Custom piece themes and board skins
-- [ ] iOS app via Capacitor
-- [x] Shared 3D tabletop with scene moods
-- [x] Image-based lighting (IBL)
-- [x] Difficulty-adaptive LLM coaching
-- [x] Keyboard navigation and accessibility improvements
-
-### License
-
-[MIT License](LICENSE).
-
----
-
-<div align="center">
-
-**如果喜欢这个项目，请给我们一个 Star! / If you like this project, give it a star!**
-
-[GitHub](https://github.com/SSC-STUDIO/Multi-Board-Game-Collection) | [Documentation](docs/DEVELOPER_GUIDE.md)
-
-</div>
+若要替换音效为真实采样，把 `<name>.wav`（名称见 `Audio3D.SOUND_NAMES`）放入 `public/assets/audio/` 并以 `new Audio3D(camera, { sampleBaseUrl: '/assets/audio' })` 启用即可。

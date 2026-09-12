@@ -1,0 +1,227 @@
+/* "复原棋局" panel, rendered inside the start-screen card. */
+
+.zt-import {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 6px;
+}
+
+.zt-import__drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 22px 18px;
+  border: 1.5px dashed rgba(120, 90, 60, 0.55);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.28);
+  text-align: center;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.zt-import.is-dragover .zt-import__drop {
+  border-color: #b3141c;
+  background: rgba(255, 245, 235, 0.7);
+}
+
+.zt-import.has-source .zt-import__drop {
+  display: none;
+}
+
+.zt-import__drophint {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.8;
+  letter-spacing: 0.04em;
+  color: #7a6a58;
+}
+
+.zt-seal--small {
+  padding: 10px 24px;
+  font-size: 18px;
+}
+
+.zt-import__stage {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.zt-import.has-source .zt-import__stage {
+  display: flex;
+}
+
+.zt-import__canvas {
+  display: block;
+  max-width: 100%;
+  border-radius: 4px;
+  box-shadow: 0 8px 24px rgba(40, 20, 10, 0.35), inset 0 0 0 1px rgba(120, 90, 60, 0.4);
+  cursor: crosshair;
+  touch-action: none;
+  background: #14100c;
+}
+
+.zt-import.is-busy .zt-import__canvas {
+  opacity: 0.6;
+}
+
+.zt-import__tools {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.zt-import__edithint {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  line-height: 1.7;
+  color: #7a6a58;
+  text-align: center;
+}
+
+.zt-import__status {
+  min-height: 1.2em;
+  margin: 0;
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+  text-align: center;
+  color: #5a4a3a;
+}
+
+.zt-import__status[data-tone="warn"] {
+  color: #9a5a10;
+}
+
+.zt-import__status[data-tone="error"] {
+  color: #b3141c;
+}
+
+.zt-import__summary {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.zt-import__counts {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  color: #2f2219;
+}
+
+.zt-import__stone {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  margin-left: 6px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+
+.zt-import__stone--black {
+  background: radial-gradient(circle at 35% 35%, #555, #111 70%);
+  margin-left: 0;
+}
+
+.zt-import__stone--white {
+  background: radial-gradient(circle at 35% 35%, #fff, #ddd 75%);
+}
+
+.zt-import__verdict {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border-left: 3px solid #4a7a3a;
+  background: rgba(255, 255, 255, 0.35);
+  font-size: 13.5px;
+  line-height: 1.75;
+  letter-spacing: 0.04em;
+  color: #2f2219;
+}
+
+.zt-import__verdict[data-tone="warn"] {
+  border-left-color: #c47d12;
+}
+
+.zt-import__verdict[data-tone="error"] {
+  border-left-color: #b3141c;
+}
+
+.zt-import__turn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: "STKaiti", "KaiTi", "Noto Serif SC", serif;
+  font-size: 15px;
+  letter-spacing: 0.1em;
+  color: #2f2219;
+}
+
+.zt-import__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 4px;
+}
+
+.zt-seal:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.zt-start__secondary {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 18px;
+  margin-top: 14px;
+}
+
+.zt-link {
+  appearance: none;
+  border: 0;
+  padding: 4px 2px;
+  background: transparent;
+  color: #5a4a3a;
+  font: inherit;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(90, 74, 58, 0.35);
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.zt-link:hover {
+  color: #b3141c;
+  border-bottom-color: #b3141c;
+}
+
+.zt-link:focus-visible {
+  outline: 2px solid #b3141c;
+  outline-offset: 2px;
+}
+
+.zt-start__stats {
+  margin: 4px 0 0;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  color: #8a7a68;
+}
+
+@media (max-height: 720px) {
+  .zt-import__drop {
+    padding: 14px 12px;
+  }
+
+  .zt-import {
+    gap: 10px;
+  }
+}

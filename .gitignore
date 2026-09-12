@@ -1,33 +1,15 @@
-# Dependencies
 node_modules/
-
-# Build outputs
-builds/
 dist/
-output/
-
-# Local tool caches
-chrome/
-.playwright-cli/
-.playwright-mcp/
-
-# Environment
-.env
-
-# OS / editor
 .DS_Store
-Thumbs.db
+*.log
+.env
+.env.local
+coverage/
 .vscode/
 .idea/
-*.iml
-*.swp
-*.swo
-*~
-*.log
+*.tmp
+_tmp*
 
-# Test artifacts & scratch files
-test-results/
-tmp-*.mjs
-tmp-*.spec.mjs
-go-3d-*.png
-mobile-setup.png
+# Downloaded CC0 / OFL assets (~50 MB). Recreate with `npm run assets`;
+# without them the app falls back to its procedural materials.
+public/assets/

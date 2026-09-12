@@ -1,0 +1,326 @@
+/* Start screen / settings sheet Ã¢Â?the only 2D surface, removed from the DOM during play. */
+
+/* Brush calligraphy (SIL OFL, fetched by `npm run assets`); system kaiti fonts take over when absent. */
+@font-face {
+  font-family: "Ma Shan Zheng";
+  src: url("/assets/fonts/MaShanZheng-Regular.ttf") format("truetype");
+  font-display: swap;
+}
+
+.zt-start {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  box-sizing: border-box;
+  color: #2a1f18;
+  font-family: "Noto Serif SC", "Songti SC", "STSong", "SimSun", Georgia, serif;
+  opacity: 0;
+  transition: opacity 0.55s ease;
+}
+
+.zt-start.is-visible {
+  opacity: 1;
+}
+
+.zt-start.is-hiding {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.zt-start__veil {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 45%, rgba(24, 16, 10, 0.25) 0%, rgba(14, 9, 6, 0.72) 62%, rgba(8, 5, 4, 0.9) 100%);
+}
+
+.zt-start__card {
+  position: relative;
+  width: min(92vw, 640px);
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 34px 40px 26px;
+  border-radius: 6px;
+  border: 1px solid rgba(120, 90, 60, 0.45);
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(255, 252, 244, 0.65), transparent 55%),
+    linear-gradient(160deg, #f5ecda 0%, #efe3cc 60%, #e9dcc3 100%);
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 6px rgba(255, 255, 255, 0.35),
+    inset 0 0 0 7px rgba(120, 90, 60, 0.28);
+  transform: translateY(0) scale(1);
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(120, 90, 60, 0.5) transparent;
+}
+
+.zt-start:not(.is-visible) .zt-start__card {
+  transform: translateY(26px) scale(0.985);
+}
+
+.zt-start__brand {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.zt-start__logo {
+  width: 72px;
+  height: 72px;
+  flex: none;
+  filter: drop-shadow(0 8px 14px rgba(40, 20, 10, 0.35));
+}
+
+.zt-start__title {
+  margin: 0;
+  font-family: "Ma Shan Zheng", "STXingkai", "STKaiti", "KaiTi", "Noto Serif SC", serif;
+  font-size: 44px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1.1;
+  color: #1f1712;
+}
+
+.zt-start__sub {
+  margin: 6px 0 0;
+  font-size: 12.5px;
+  letter-spacing: 0.16em;
+  color: #7a6a58;
+}
+
+.zt-start__rule {
+  height: 2px;
+  margin: 22px 0 6px;
+  background: linear-gradient(90deg, transparent, rgba(40, 28, 20, 0.7) 18%, rgba(40, 28, 20, 0.7) 82%, transparent);
+  opacity: 0.75;
+}
+
+/* The import panel replaces the settings rows inside the same card. */
+.zt-start__import {
+  display: none;
+}
+
+.zt-start.is-import .zt-start__import {
+  display: block;
+}
+
+.zt-start.is-import .zt-start__settings,
+.zt-start.is-import .zt-start__actions,
+.zt-start.is-import .zt-start__secondary,
+.zt-start.is-import .zt-start__hint {
+  display: none;
+}
+
+.zt-start.is-import .zt-start__card {
+  width: min(94vw, 680px);
+}
+
+.zt-row {
+  display: grid;
+  grid-template-columns: 104px 1fr;
+  align-items: center;
+  gap: 14px;
+  padding: 11px 0;
+  border-bottom: 1px dashed rgba(120, 90, 60, 0.28);
+}
+
+.zt-row:last-child {
+  border-bottom: 0;
+}
+
+.zt-row__label {
+  font-family: "Ma Shan Zheng", "STKaiti", "KaiTi", "Noto Serif SC", serif;
+  font-size: 18px;
+  letter-spacing: 0.12em;
+  color: #2f2219;
+}
+
+.zt-seg {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.zt-seg__btn {
+  appearance: none;
+  border: 1px solid rgba(60, 40, 25, 0.45);
+  background: rgba(255, 255, 255, 0.35);
+  color: #3a2a1c;
+  padding: 6px 15px;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.1s;
+}
+
+.zt-seg__btn:hover {
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.zt-seg__btn:active {
+  transform: scale(0.97);
+}
+
+.zt-seg__btn[aria-pressed="true"] {
+  background: #1f1b18;
+  border-color: #1f1b18;
+  color: #f5eede;
+}
+
+.zt-seg__btn:focus-visible,
+.zt-seal:focus-visible,
+.zt-ghost:focus-visible {
+  outline: 2px solid #b3141c;
+  outline-offset: 2px;
+}
+
+.zt-start__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 26px;
+}
+
+.zt-seal {
+  appearance: none;
+  border: 0;
+  border-radius: 6px;
+  padding: 14px 34px;
+  background: #b3141c;
+  color: #fff4e6;
+  font-family: "Ma Shan Zheng", "STKaiti", "KaiTi", "Noto Serif SC", serif;
+  font-size: 22px;
+  letter-spacing: 0.22em;
+  text-indent: 0.22em;
+  cursor: pointer;
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 235, 220, 0.55),
+    inset 0 0 0 5px #b3141c,
+    inset 0 0 0 6px rgba(255, 235, 220, 0.35),
+    0 12px 26px rgba(120, 10, 10, 0.35);
+  transition: transform 0.12s, box-shadow 0.2s, background 0.2s;
+}
+
+.zt-seal:hover {
+  background: #c21a22;
+  transform: translateY(-1px);
+}
+
+.zt-seal:active {
+  transform: translateY(1px) scale(0.985);
+}
+
+.zt-ghost {
+  appearance: none;
+  border: 1px solid rgba(40, 28, 20, 0.6);
+  border-radius: 6px;
+  padding: 14px 26px;
+  background: transparent;
+  color: #2a1f18;
+  font-family: "Ma Shan Zheng", "STKaiti", "KaiTi", "Noto Serif SC", serif;
+  font-size: 20px;
+  letter-spacing: 0.18em;
+  text-indent: 0.18em;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.12s;
+}
+
+.zt-ghost:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.zt-start__hint {
+  margin: 18px 0 0;
+  text-align: center;
+  font-size: 12.5px;
+  line-height: 1.8;
+  letter-spacing: 0.06em;
+  color: #7a6a58;
+}
+
+@media (max-width: 560px) {
+  .zt-start__card {
+    padding: 24px 20px 20px;
+  }
+
+  .zt-start__title {
+    font-size: 34px;
+  }
+
+  .zt-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+/* Short viewports (laptops with the browser chrome open): tighten so the sheet never needs to scroll. */
+@media (max-height: 720px) {
+  .zt-start__card {
+    padding: 18px 28px 16px;
+  }
+
+  .zt-start__logo {
+    width: 52px;
+    height: 52px;
+  }
+
+  .zt-start__title {
+    font-size: 32px;
+  }
+
+  .zt-start__sub {
+    margin-top: 2px;
+    font-size: 11.5px;
+  }
+
+  .zt-start__rule {
+    margin: 12px 0 2px;
+  }
+
+  .zt-row {
+    padding: 6px 0;
+  }
+
+  .zt-row__label {
+    font-size: 16px;
+  }
+
+  .zt-seg__btn {
+    padding: 4px 12px;
+    font-size: 13px;
+  }
+
+  .zt-start__actions {
+    margin-top: 14px;
+  }
+
+  .zt-seal,
+  .zt-ghost {
+    padding: 10px 26px;
+    font-size: 19px;
+  }
+
+  .zt-start__hint {
+    margin-top: 10px;
+    font-size: 11.5px;
+    line-height: 1.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zt-start,
+  .zt-start__card,
+  .zt-seg__btn,
+  .zt-seal,
+  .zt-ghost {
+    transition: none;
+  }
+}

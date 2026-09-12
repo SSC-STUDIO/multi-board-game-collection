@@ -1,0 +1,42 @@
+{
+  "$comment": "Source list for `npm run assets` (tools/fetch-assets.mjs). Poly Haven assets are CC0 (https://polyhaven.com/license); Google Fonts entries are SIL OFL 1.1 and ship with their OFL.txt.",
+  "polyhaven": {
+    "textures": {
+      "table_walnut": { "id": "black_walnut_veneer_01", "res": "2k", "maps": ["diff", "nor_gl", "arm"] },
+      "board_oak": { "id": "red_oak_veneer", "res": "2k", "maps": ["diff", "nor_gl", "arm"] },
+      "floor_planks": { "id": "dark_wooden_planks", "res": "1k", "maps": ["diff", "nor_gl", "arm"] },
+      "wall_plaster": { "id": "plastered_wall_02", "res": "1k", "maps": ["diff", "nor_gl", "arm"] },
+      "rosewood": { "id": "rosewood_veneer1", "res": "1k", "maps": ["diff", "nor_gl", "arm"] },
+      "leather": { "id": "brown_leather", "res": "1k", "maps": ["diff", "nor_gl", "arm"] },
+      "velvet": { "id": "velour_velvet", "res": "1k", "maps": ["diff", "nor_gl", "arm"] },
+      "hessian": { "id": "hessian_380", "res": "1k", "maps": ["diff", "nor_gl", "arm"] }
+    },
+    "models": {
+      "chinese_stool": { "res": "1k" },
+      "chinese_tea_table": { "res": "1k" },
+      "tea_set_01": { "res": "1k" },
+      "antique_ceramic_vase_01": { "res": "1k" },
+      "potted_plant_01": { "res": "1k" }
+    },
+    "hdris": {
+      "fireplace": { "res": "1k" },
+      "pine_attic": { "res": "1k" }
+    }
+  },
+  "fonts": [
+    {
+      "family": "Ma Shan Zheng",
+      "file": "MaShanZheng-Regular.ttf",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/mashanzheng/MaShanZheng-Regular.ttf",
+      "licenseUrl": "https://raw.githubusercontent.com/google/fonts/main/ofl/mashanzheng/OFL.txt",
+      "role": "kai"
+    },
+    {
+      "family": "Zhi Mang Xing",
+      "file": "ZhiMangXing-Regular.ttf",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/zhimangxing/ZhiMangXing-Regular.ttf",
+      "licenseUrl": "https://raw.githubusercontent.com/google/fonts/main/ofl/zhimangxing/OFL.txt",
+      "role": "xing"
+    }
+  ]
+}

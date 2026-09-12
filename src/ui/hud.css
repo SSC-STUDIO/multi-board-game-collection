@@ -1,0 +1,196 @@
+/* Bottom captions (end-of-game hints, tutorial steps, restored-position note). Detached from the DOM when empty. */
+
+.zt-hud {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, auto) minmax(0, 1fr);
+  align-items: end;
+  gap: 12px;
+  padding: 0 18px calc(16px + env(safe-area-inset-bottom, 0px));
+  box-sizing: border-box;
+  pointer-events: none;
+  font-family: "Noto Serif SC", "Songti SC", "STSong", "SimSun", Georgia, serif;
+  color: #2a1f18;
+  transition: opacity 0.3s ease;
+}
+
+.zt-hud.is-suppressed {
+  opacity: 0;
+}
+
+.zt-hud__slot {
+  display: flex;
+  min-width: 0;
+}
+
+.zt-hud__slot--left {
+  justify-content: flex-start;
+}
+
+.zt-hud__slot--center {
+  justify-content: center;
+}
+
+.zt-hud__slot--right {
+  justify-content: flex-end;
+}
+
+.zt-hud__card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: min(560px, 92vw);
+  padding: 10px 16px;
+  border-radius: 6px;
+  border: 1px solid rgba(120, 90, 60, 0.5);
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(255, 252, 244, 0.7), transparent 55%),
+    linear-gradient(160deg, rgba(245, 236, 218, 0.94) 0%, rgba(239, 227, 204, 0.94) 60%, rgba(233, 220, 195, 0.94) 100%);
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.45),
+    inset 0 0 0 3px rgba(255, 255, 255, 0.3),
+    inset 0 0 0 4px rgba(120, 90, 60, 0.22);
+  pointer-events: auto;
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.45s ease, transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.zt-hud__card.is-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.zt-hud__slot--left .zt-hud__card,
+.zt-hud__slot--right .zt-hud__card {
+  max-width: min(320px, 44vw);
+}
+
+.zt-hud__arrow {
+  flex: none;
+  font-size: 15px;
+  color: #b3141c;
+  animation: zt-hud-nudge 1.6s ease-in-out infinite;
+}
+
+.zt-hud__card--arrow-right {
+  flex-direction: row-reverse;
+}
+
+.zt-hud__arrow--right {
+  animation-name: zt-hud-nudge-right;
+}
+
+@keyframes zt-hud-nudge {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-5px); }
+}
+
+@keyframes zt-hud-nudge-right {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(5px); }
+}
+
+.zt-hud__body {
+  min-width: 0;
+}
+
+.zt-hud__title {
+  font-family: "STKaiti", "KaiTi", "Noto Serif SC", serif;
+  font-size: 18px;
+  letter-spacing: 0.12em;
+  color: #1f1712;
+  margin-bottom: 3px;
+}
+
+.zt-hud__text {
+  font-size: 13px;
+  line-height: 1.7;
+  letter-spacing: 0.05em;
+  color: #4a3a2c;
+}
+
+.zt-hud__meta {
+  margin-left: 12px;
+  font-size: 11.5px;
+  letter-spacing: 0.1em;
+  color: #8a7a68;
+}
+
+.zt-hud__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.zt-hud__btn {
+  appearance: none;
+  border: 1px solid rgba(60, 40, 25, 0.5);
+  border-radius: 999px;
+  padding: 5px 14px;
+  background: rgba(255, 255, 255, 0.4);
+  color: #3a2a1c;
+  font: inherit;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.zt-hud__btn:hover {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.zt-hud__btn:active {
+  transform: scale(0.97);
+}
+
+.zt-hud__btn--primary {
+  border-color: #b3141c;
+  background: #b3141c;
+  color: #fff4e6;
+}
+
+.zt-hud__btn--primary:hover {
+  background: #c21a22;
+}
+
+.zt-hud__btn:focus-visible {
+  outline: 2px solid #b3141c;
+  outline-offset: 2px;
+}
+
+@media (max-width: 720px) {
+  .zt-hud {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .zt-hud__slot--left,
+  .zt-hud__slot--right {
+    justify-content: center;
+  }
+
+  .zt-hud__slot--left .zt-hud__card,
+  .zt-hud__slot--right .zt-hud__card {
+    max-width: 92vw;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zt-hud__card {
+    transition: none;
+  }
+
+  .zt-hud__arrow {
+    animation: none;
+  }
+}

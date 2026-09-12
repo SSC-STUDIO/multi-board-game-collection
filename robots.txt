@@ -1,4 +1,0 @@
-﻿User-agent: *
-Allow: /
-
-Sitemap: https://ssc-studio.github.io/Multi-Board-Game-Collection/sitemap.xml

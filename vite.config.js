@@ -1,31 +1,30 @@
-import { defineConfig } from 'vite';
-import { resolve, dirname } from 'path';
-import { fileURLToPath } from 'url';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
-    root: '.',
-    publicDir: 'assets',
-    build: {
-        outDir: 'builds/web',
-        emptyOutDir: true,
-        rollupOptions: {
-            input: {
-                main: resolve(__dirname, 'index.html'),
-            },
-            output: {
-                manualChunks(id) {
-                    if (id.includes('node_modules/three/')) {
-                        return 'three';
-                    }
-                },
-            },
-        },
+  server: {
+    port: 5173,
+    open: false,
+    watch: {
+      // OneDrive + smoke/thumbnail writes can trigger EBUSY on file watchers.
+      ignored: ['**/_tmp_smoke/**', '**/_tmp_thumbs/**'],
     },
-    server: {
-        port: 4173,
-        open: false,
+  },
+  build: {
+    outDir: 'dist',
+    target: 'es2022',
+    sourcemap: false,
+    // The three.js vendor chunk alone is ~507 kB minified (129 kB gzip).
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        // Three.js is ~90% of the bundle; keep it in its own long-lived chunk.
+        manualChunks: { three: ['three'] },
+      },
     },
-    assetsInclude: ['**/*.glsl'],
+  },
+  test: {
+    // src/core, utils and the camera director are DOM-free by design and run under plain Node.
+    environment: 'node',
+    include: ['tests/**/*.test.js'],
+  },
 });

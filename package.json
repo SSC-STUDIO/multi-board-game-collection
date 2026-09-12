@@ -1,57 +1,39 @@
 {
-  "name": "board-games",
-  "version": "1.0.0",
-  "description": "五子棋与围棋合集 / Gomoku and Go with 3D boards and optional LLM coaching",
+  "name": "zenith-tabletop-3d",
+  "version": "0.1.0",
+  "description": "Next-Gen Spatial Tabletop Platform with Diegetic 3D UI",
   "private": true,
   "type": "module",
-  "main": "electron-main.js",
-  "author": "Your Name",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/SSC-STUDIO/Multi-Board-Game-Collection.git"
-  },
+  "main": "src/main.js",
   "scripts": {
-    "check": "node tools/check.mjs",
     "serve": "node tools/serve.mjs",
-    "build": "node tools/build.mjs",
     "dev": "vite",
-    "vite:build": "vite build",
-    "vite:preview": "vite preview",
-    "android:sync": "npm run build && npx cap sync android",
-    "android:open": "npm run android:sync && npx cap open android",
-    "android:build:debug": "npm run android:sync && node tools/android-gradle.mjs assembleDebug && node tools/copy-android-apk.mjs debug",
-    "build:android": "npm run android:build:debug",
-    "build:win": "electron-builder --config electron.json --win",
-    "build:mac": "electron-builder --config electron.json --mac",
-    "build:linux": "electron-builder --config electron.json --linux",
-    "build:all": "electron-builder --config electron.json -mwl",
-    "start": "node --input-type=module -e \"import path from 'node:path'; import { pathToFileURL } from 'node:url'; const entry = path.resolve(path.dirname(process.env.npm_package_json), 'tools/run-electron.mjs'); await import(pathToFileURL(entry).href);\"",
-    "start:dev": "node --input-type=module -e \"process.env.GOMOKU_ELECTRON_DEV='1'; import path from 'node:path'; import { pathToFileURL } from 'node:url'; const entry = path.resolve(path.dirname(process.env.npm_package_json), 'tools/run-electron.mjs'); await import(pathToFileURL(entry).href);\"",
-    "clean": "node tools/clean.mjs",
+    "build": "vite build",
+    "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "smoke": "node tools/smoke.mjs",
+    "perf": "node tools/perf.mjs",
+    "assets": "node tools/fetch-assets.mjs"
   },
   "keywords": [
+    "board-game",
+    "threejs",
+    "3d",
+    "diegetic-ui",
     "gomoku",
-    "go",
-    "五子棋",
-    "围棋",
-    "board game",
-    "strategy",
-    "game"
+    "spatial-ui"
   ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
   "dependencies": {
-    "@capacitor/android": "^8.3.1",
-    "@capacitor/core": "^8.3.1",
     "three": "^0.164.0"
   },
   "devDependencies": {
-    "@capacitor/cli": "^8.3.1",
-    "electron": "^28.0.0",
-    "electron-builder": "^24.9.1",
-    "playwright-core": "^1.62.1",
-    "vite": "^8.0.10",
-    "vitest": "^4.1.5"
+    "vite": "^5.2.0",
+    "vitest": "^1.6.0"
   }
 }
