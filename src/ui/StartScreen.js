@@ -15,6 +15,8 @@ import { publicUrl } from '../utils/PublicUrl.js';
 
 const HINT_TITLE = '入座后揭开黑罐或白罐选择执子颜色 · 拖动环视桌案 · 滚轮推拉 · 点击桌面空白处回正 · Esc 打开设置';
 const HINT_MENU = '规则与用时在开新对局时生效 · 棋力、画质与音效即时生效 · 再按 Esc 继续对弈';
+const TOUCH_HINT_TITLE = '入座后点棋罐选择执子 · 单指拖动环视 · 双指缩放 · 点桌面空白回正 · 点桌案“设置”打开菜单';
+const TOUCH_HINT_MENU = '规则与用时在开新对局时生效 · 棋力、画质与音效即时生效 · 点“继续对弈”返回棋局';
 
 /**
  * @typedef {typeof DEFAULT_SETTINGS} Settings
@@ -220,14 +222,14 @@ export class StartScreen {
         canResign ? link('resign', '认输') : '',
         link('tutorial', '新手指导'),
       ].join('');
-      hint.textContent = HINT_MENU;
+      hint.textContent = globalThis.matchMedia?.('(pointer: coarse)').matches ? TOUCH_HINT_MENU : HINT_MENU;
     } else {
       footer.innerHTML = `
         ${this._savedGame ? '<button type="button" class="zt-seal" data-action="continue-saved">继续上次棋局</button>' : ''}
         <button type="button" class="${this._savedGame ? 'zt-ghost' : 'zt-seal'}" data-action="start">${this._savedGame ? '另开新局' : '入座对弈'}</button>
         <button type="button" class="zt-ghost" data-action="import">复原棋局</button>`;
       secondary.innerHTML = link('tutorial', '新手指导');
-      hint.textContent = this._savedGame ? `上次已保存 ${this._savedGame.moves.length} 手 · 保留执子、规则和剩余用时 · 离开期间不扣时` : HINT_TITLE;
+      hint.textContent = this._savedGame ? `上次已保存 ${this._savedGame.moves.length} 手 · 保留执子、规则和剩余用时 · 离开期间不扣时` : (globalThis.matchMedia?.('(pointer: coarse)').matches ? TOUCH_HINT_TITLE : HINT_TITLE);
     }
   }
 

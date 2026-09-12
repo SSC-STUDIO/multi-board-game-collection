@@ -45,6 +45,7 @@ import { Figure } from './spatial/entities/Figure.js';
 import { Audio3D } from './services/Audio3D.js';
 import { AiService } from './services/AiService.js';
 import { SessionStore } from './services/SessionStore.js';
+import { isNativeApp, setupNativePlatform, shareNativeRecord } from './services/NativePlatform.js';
 import { AssetLibrary } from './services/AssetLibrary.js';
 import { LLMCoachService } from './services/LLMCoachService.js';
 import { StartScreen } from './ui/StartScreen.js';
@@ -210,7 +211,11 @@ export class ZenithApp {
       onNewGame: (s) => this.newGameFromMenu(s),
       onChange: (s) => this.applyLiveSettings(s),
       onTutorial: (s) => this.startTutorial(s),
-      onSave: () => this.saveRecord(),
+      onSave: () => this.saveRecord().catch((error) => {
+        console.warn('[zenith] record export:', error);
+        // Android also reports a dismissed share sheet as a rejected promise.
+        if (!/cancel/i.test(error.message ?? '')) globalThis.alert('棋谱导出未完成，请重试。当前棋局已自动保存在本机。');
+      }),
       onResign: (s) => this.resignFromMenu(s),
     });
 
@@ -451,8 +456,9 @@ export class ZenithApp {
   }
 
   /** "保存棋谱": download the current game (setup + moves) as a small JSON record. */
-  saveRecord() {
+  async saveRecord() {
     const record = toRecord(this.engine.getState());
+    if (isNativeApp()) return shareNativeRecord(record);
     const blob = new Blob([JSON.stringify(record, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -1317,6 +1323,7 @@ export class ZenithApp {
   }
 
   dispose() {
+    this.disposeNative?.();
     this.cancelAi();
     window.removeEventListener('keydown', this._onKeyDown);
     window.removeEventListener('pagehide', this._onPageHide);
@@ -1349,6 +1356,7 @@ async function boot() {
   const app = new ZenithApp(canvas, loadSettings(), { debug, assets });
   document.getElementById('boot')?.remove();
   globalThis.zenith = app;
+  app.disposeNative = await setupNativePlatform(app);
   if (import.meta.hot) import.meta.hot.dispose(() => app.dispose());
   return app;
 }
