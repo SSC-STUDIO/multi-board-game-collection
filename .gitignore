@@ -11,3 +11,4 @@ coverage/
 _tmp*
 
 # Curated CC0 / OFL assets are versioned so clones reproduce the scene offline.
+artifacts/video/

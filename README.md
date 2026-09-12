@@ -88,3 +88,7 @@ window.ZENITH_CONFIG = {
 - `tests/`、`tools/`：单元测试、浏览器验证与资源下载工具。
 
 [开发状态与验证范围](docs/DEVELOPMENT_PLAN.md) · [道具动效设计](docs/DIEGETIC_UI_SPEC.md)
+
+## 手机宣传视频
+
+提供 9:16 竖屏宣传片制作脚本，完整呈现 21 手实战、人物动作、暂停悔棋、战术提示、终局与复盘。执行 `npm run video:capture`、`npm run video:encode`、`npm run video:verify`，即可生成 1080p 成片、720p 分享版、封面和棋谱。详见 [录制与验证说明](docs/PROMO_VIDEO.md)。

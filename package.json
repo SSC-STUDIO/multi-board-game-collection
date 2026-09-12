@@ -16,7 +16,10 @@
     "perf": "node tools/perf.mjs",
     "assets": "node tools/fetch-assets.mjs",
     "test:features": "node tools/features.mjs",
-    "test:production": "node tools/production-smoke.mjs"
+    "test:production": "node tools/production-smoke.mjs",
+    "video:capture": "node tools/promo/capture.mjs",
+    "video:encode": "node tools/promo/encode.mjs",
+    "video:verify": "node tools/promo/verify.mjs"
   },
   "keywords": [
     "board-game",
