@@ -63,6 +63,8 @@ Three.js 渲染棋室和动态道具。双方棋手使用 Kay Lousberg 的 KayKi
 
 ## 构建与发布
 
+Android 手机安装包见 [GitHub Releases](https://github.com/SSC-STUDIO/Zenith-Tabletop-3D/releases)。APK 内置全部场景资源和 AI，可离线对弈，支持横竖屏、系统返回键、后台保存暂停和棋谱分享。执行 `npm run android:apk` 可构建签名安装包；环境、签名备份及验证说明见 [Android 文档](docs/ANDROID.md)。
+
 `dist/` 是完整的静态站点，可部署在域名根路径或 `/Zenith-Tabletop-3D/` 这样的仓库子路径。模型、字体、纹理和 AI Worker 都按部署路径加载。
 
 GitHub Actions 在推送及 PR 时执行测试、构建和浏览器验证。另提供手动的 `Publish Zenith to Pages` 工作流：在仓库 Settings → Pages 中选择 GitHub Actions 后，可手动运行它发布 `dist/`。

@@ -12,3 +12,8 @@ _tmp*
 
 # Curated CC0 / OFL assets are versioned so clones reproduce the scene offline.
 artifacts/video/
+artifacts/android/
+*.jks
+*.keystore
+*.p12
+android/keystore.properties

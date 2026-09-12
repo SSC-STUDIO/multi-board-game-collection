@@ -1,0 +1,14 @@
+{
+  "appId": "com.sscstudio.zenithtabletop3d",
+  "appName": "Zenith Tabletop 3D",
+  "webDir": "dist",
+  "backgroundColor": "#14100c",
+  "android": {
+    "backgroundColor": "#14100c",
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": false
+  },
+  "plugins": {
+    "SystemBars": { "insetsHandling": "native", "style": "DARK" }
+  }
+}

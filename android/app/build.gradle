@@ -1,0 +1,80 @@
+apply plugin: 'com.android.application'
+
+def zenithVersion = new groovy.json.JsonSlurper().parse(file('../../package.json')).version
+def releaseStore = System.getenv('ZENITH_STORE_FILE')
+
+android {
+    namespace = "com.sscstudio.zenithtabletop3d"
+    compileSdk = rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "com.sscstudio.zenithtabletop3d"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName zenithVersion
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    buildFeatures { buildConfig true }
+    signingConfigs {
+        if (releaseStore) {
+            release {
+                storeFile file(releaseStore)
+                storePassword System.getenv('ZENITH_STORE_PASSWORD')
+                keyAlias System.getenv('ZENITH_KEY_ALIAS') ?: 'zenith'
+                keyPassword System.getenv('ZENITH_KEY_PASSWORD')
+            }
+        }
+    }
+    buildTypes {
+        debug {
+            applicationIdSuffix '.debug'
+            versionNameSuffix '-debug'
+        }
+        release {
+            if (releaseStore) signingConfig signingConfigs.release
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+tasks.register('requireReleaseSigning') {
+    doLast {
+        if (!releaseStore) throw new GradleException('Release signing required: run npm run android:apk or set ZENITH_STORE_* / ZENITH_KEY_* variables.')
+    }
+}
+tasks.matching { it.name == 'preReleaseBuild' }.configureEach { dependsOn 'requireReleaseSigning' }
+
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation project(':capacitor-android')
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    implementation project(':capacitor-cordova-android-plugins')
+}
+
+apply from: 'capacitor.build.gradle'
+
+try {
+    def servicesJSON = file('google-services.json')
+    if (servicesJSON.text) {
+        apply plugin: 'com.google.gms.google-services'
+    }
+} catch(Exception e) {
+    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}
