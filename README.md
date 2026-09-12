@@ -13,7 +13,7 @@ npm ci
 npm run dev
 ```
 
-访问 http://localhost:5173。仓库已包含约 57 MB 的精选模型、材质和字体，运行时不必在线下载。
+访问 http://localhost:5173。仓库已包含约 64 MB 的精选模型、材质和字体，运行时不必在线下载。
 
 ```sh
 npm run serve          # 无打包静态开发服务，默认 8080
@@ -55,7 +55,7 @@ npm run test:production # 仓库子路径下的生产包及 AI Worker 验证
 
 ## 画面与模型
 
-Three.js 渲染程序化棋室和动态道具。木扶手椅、旧书、坐凳、茶几、青花茶具、花瓶、盆栽来自 Poly Haven，使用 CC0 许可；PBR 木纹、皮革、织物和 HDRI 同源。马善政体和志莽行书使用 OFL 许可。来源及修改说明见 [素材清单](docs/ASSET_CREDITS.md)，完整许可随字体保留。
+Three.js 渲染棋室和动态道具。双方棋手使用 Kay Lousberg 的 KayKit Rogue / Mage 骨骼人物模型，按棋手比例调整坐姿，实时跟随取子、落子、记谱、沉思和行礼动作，移除武器与高帽。木扶手椅、旧书、坐凳、茶几、青花茶具、花瓶、盆栽来自 Poly Haven；PBR 木纹、皮革、织物和 HDRI 同源。模型均采用 CC0 许可；马善政体和志莽行书使用 OFL 许可。来源及修改说明见 [素材清单](docs/ASSET_CREDITS.md)，原始许可随资源保留。
 
 模型加载成功后才隐藏相应的程序化道具。旧书只使用三本模型，避免整套 20 本书带来的额外绘制。可执行 `npm run assets` 补齐缺失资源；加 `-- --force` 可重新下载。
 

@@ -315,6 +315,10 @@ export class ZenithApp {
     const hideFallback = (name, model) => {
       if (model) this.decor.group.traverse(o => { if (o.name === name) o.visible = false; });
     };
+    for (const [id, figure] of [['kaykit_mage', this.opponent], ['kaykit_rogue', this.player]]) {
+      assets.loadModel(id).then(model => figure.setCharacterModel(model))
+        .catch(err => console.warn(`[zenith] character rig failed: ${id}`, err.message));
+    }
     // Seat tops land at y = −2.3 like the procedural stools, so seated figures stay in place.
     Promise.all([
       place(assets.loadModel('chinese_stool', { height: 5.7 }), [0, floorY, 16.5], 0),
@@ -749,10 +753,7 @@ export class ZenithApp {
     const cam = this.world.camera.getWorldPosition(this._camPos);
     for (const figure of [this.player, this.opponent]) {
       const near = figure.getHeadWorldPosition(this._headPos).distanceTo(cam) < 3.2;
-      if (figure.head.visible === near) figure.head.visible = !near;
-      // A first-person body must not cover the near board edge or the desk controls.
-      figure.body.visible = !near;
-      figure.legs.visible = !near;
+      figure.setFirstPerson(near);
     }
   }
 

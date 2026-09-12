@@ -40,5 +40,20 @@
       "licenseUrl": "https://raw.githubusercontent.com/google/fonts/main/ofl/zhimangxing/OFL.txt",
       "role": "xing"
     }
-  ]
+  ],
+  "kaykit": {
+    "repository": "KayKit-Game-Assets/KayKit-Character-Pack-Adventures-1.0",
+    "ref": "672074b73ba276876a19e8816ecdc5241817ab47",
+    "licensePath": "LICENSE.txt",
+    "models": {
+      "kaykit_rogue": {
+        "name": "Rogue",
+        "file": "Rogue.glb"
+      },
+      "kaykit_mage": {
+        "name": "Mage",
+        "file": "Mage.glb"
+      }
+    }
+  }
 }

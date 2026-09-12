@@ -37,13 +37,16 @@ try {
   await cdp.eval('zenith.pendingTutorial=false; zenith.enterTable(zenith.settings)');
   await cdp.eval('zenith.onBowlClick(2); true');
   for (let i=0;i<100 && await cdp.eval('zenith.engine.moves.length < 1 || zenith.carrying.size > 0');i++) await sleep(250);
+  for (let i=0;i<80 && !await cdp.eval('!!zenith.player.avatar && !!zenith.opponent.avatar');i++) await sleep(250);
   const result = await cdp.eval(`({ title:document.title, moves:zenith.engine.moves.length,
     worker:zenith.ai.offThread, model:!!zenith.world.scene.getObjectByName('chinese_armchair'),
+    avatars:!!zenith.player.avatar && !!zenith.opponent.avatar,
     fonts:!!zenith.assets.fonts.kai, dom:document.body.children.length, stones:zenith.board.stones.size })`);
   assert.equal(result.moves,1);
   assert.equal(result.stones,1);
   assert.equal(result.worker,true);
   assert.equal(result.model,true);
+  assert.equal(result.avatars,true);
   assert.equal(result.fonts,true);
   assert.equal(result.dom,1);
   assert.match(result.title,/Zenith Tabletop 3D/);

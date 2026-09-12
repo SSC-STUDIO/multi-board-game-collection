@@ -65,7 +65,9 @@
     "chinese_tea_table": "/assets/models/chinese_tea_table/chinese_tea_table_1k.gltf",
     "tea_set_01": "/assets/models/tea_set_01/tea_set_01_1k.gltf",
     "antique_ceramic_vase_01": "/assets/models/antique_ceramic_vase_01/antique_ceramic_vase_01_1k.gltf",
-    "potted_plant_01": "/assets/models/potted_plant_01/potted_plant_01_1k.gltf"
+    "potted_plant_01": "/assets/models/potted_plant_01/potted_plant_01_1k.gltf",
+    "kaykit_rogue": "/assets/models/kaykit/Rogue.glb",
+    "kaykit_mage": "/assets/models/kaykit/Mage.glb"
   },
   "hdris": {
     "fireplace": "/assets/hdri/fireplace_1k.hdr",
@@ -197,6 +199,20 @@
       "type": "font",
       "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/zhimangxing/ZhiMangXing-Regular.ttf",
       "license": "OFL-1.1"
+    },
+    {
+      "asset": "Rogue",
+      "type": "character",
+      "source": "https://github.com/KayKit-Game-Assets/KayKit-Character-Pack-Adventures-1.0",
+      "license": "CC0",
+      "author": "Kay Lousberg"
+    },
+    {
+      "asset": "Mage",
+      "type": "character",
+      "source": "https://github.com/KayKit-Game-Assets/KayKit-Character-Pack-Adventures-1.0",
+      "license": "CC0",
+      "author": "Kay Lousberg"
     }
   ]
 }

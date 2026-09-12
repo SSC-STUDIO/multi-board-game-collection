@@ -22,6 +22,19 @@ try {
     zenith.pendingTutorial = false; zenith.enterTable(zenith.settings); true`);
   await step(55);
   await sleep(750);
+  for (let i = 0; i < 80 && !await cdp.eval('!!zenith.player.avatar && !!zenith.opponent.avatar'); i++) await sleep(250);
+  const avatars = await cdp.eval(`['player','opponent'].map(key => {
+    const figure = zenith[key];
+    if (!figure.avatar) return null;
+    const skins = figure.avatar.meshes.filter(({mesh}) => mesh.isSkinnedMesh);
+    return {skins:skins.length, textures:skins.every(({mesh}) => !!mesh.material.map?.image),
+      visible:skins.filter(({mesh}) => mesh.visible).length, fallback:figure.bodyMaterial.visible};
+  })`);
+  assert.deepEqual(avatars, [
+    {skins:6,textures:true,visible:2,fallback:false},
+    {skins:6,textures:true,visible:6,fallback:false},
+  ], 'both downloaded skins are textured; first-person body stays out of the way');
+  await cdp.screenshot(path.join(out, 'characters-desktop.png'));
   assert(await cdp.eval('!!zenith.world.scene.getObjectByName("chinese_armchair")'), 'downloaded armchair loaded');
   assert.equal(await cdp.eval('zenith.world.scene.getObjectByName("book_encyclopedia_set_01")?.children[0].children.length'), 3);
 
@@ -114,7 +127,7 @@ try {
   assert(continued.black <= saved.game.clock.black && continued.black > saved.game.clock.black - 5000);
   assert.equal(continued.dom, 1);
   assert.deepEqual(problems, []);
-  console.log('✓ desk mouse/touch controls, frozen review clock, ghost cleanup, cancelled ledger work, phone menu, reload and resume');
+  console.log('✓ downloaded textured characters, first-person arms, desk mouse/touch controls, frozen review clock, ghost cleanup, cancelled ledger work, phone menu, reload and resume');
 } finally {
   cdp?.close();
   await browser.close();

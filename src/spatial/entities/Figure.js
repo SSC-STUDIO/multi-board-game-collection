@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { Entity } from './Entity.js';
+import { AvatarRig } from './AvatarRig.js';
 import { LAYOUT, STONE_HEIGHT } from '../Layout.js';
 import { createStoneGeometry, createStoneMaterial } from './Board.js';
 import { makeCanvas, canvasToTexture } from '../../utils/ProceduralTextures.js';
@@ -689,6 +690,20 @@ export class Figure extends Entity {
     this.group.visible = visible;
   }
 
+  setCharacterModel(model) {
+    if (!model || this.avatar) return;
+    this.avatar = new AvatarRig(this, model);
+    this.avatar.setFirstPerson(this._firstPerson ?? false);
+  }
+
+  setFirstPerson(near) {
+    this._firstPerson = near;
+    this.head.visible = !near;
+    this.body.visible = !near;
+    this.legs.visible = !near;
+    this.avatar?.setFirstPerson(near);
+  }
+
   update(dt, elapsed) {
     super.update(dt, elapsed);
     this._refreshInverse();
@@ -708,10 +723,12 @@ export class Figure extends Entity {
 
     this._updateHead(dt, elapsed, lift);
     for (const arm of this._armList) this._updateArm(arm, dt, lift);
+    this.avatar?.update();
   }
 
   dispose() {
     this.cancelGestures();
+    this.avatar?.dispose();
     this.faceTexture?.dispose();
     super.dispose();
   }

@@ -28,5 +28,6 @@ jobs:
           name: zenith-browser-evidence
           path: |
             _tmp_smoke/*.png
+            _tmp_features/*.png
             _tmp_production/*.png
           if-no-files-found: ignore

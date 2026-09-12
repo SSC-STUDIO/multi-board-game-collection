@@ -136,6 +136,21 @@ async function main() {
     manifest.credits.push({ asset: font.family, type: 'font', source: font.url, license: 'OFL-1.1' });
   }
 
+  // --- KayKit characters (CC0, pinned to an official release commit) ---
+  if (source.kaykit) {
+    const { repository, ref, licensePath, models } = source.kaykit;
+    const base = `https://raw.githubusercontent.com/${repository}/${ref}`;
+    const dir = path.join(OUT_ROOT, 'models', 'kaykit');
+    tasks.push(() => download(`${base}/${licensePath}`, path.join(dir, 'LICENSE.txt')));
+    for (const [id, spec] of Object.entries(models)) {
+      const dest = path.join(dir, spec.file);
+      tasks.push(() => download(`${base}/addons/kaykit_character_pack_adventures/Characters/gltf/${spec.file}`, dest));
+      manifest.models[id] = publicPath(dest);
+      manifest.credits.push({ asset: `KayKit ${spec.name}`, type: 'model', author: 'Kay Lousberg',
+        source: `https://github.com/${repository}/tree/${ref}`, license: 'CC0' });
+    }
+  }
+
   console.log(`▶ fetching ${tasks.length} files → ${path.relative(ROOT, OUT_ROOT)}`);
   const failures = await runAll(tasks);
   await fs.writeFile(path.join(OUT_ROOT, 'manifest.json'), JSON.stringify(manifest, null, 2));
