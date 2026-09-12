@@ -1,7 +1,7 @@
 {
   "name": "zenith-tabletop-3d",
   "version": "0.1.0",
-  "description": "Next-Gen Spatial Tabletop Platform with Diegetic 3D UI",
+  "description": "Zenith Tabletop 3D — immersive Gomoku with diegetic controls, AI, replay and saved sessions",
   "private": true,
   "type": "module",
   "main": "src/main.js",
@@ -14,7 +14,9 @@
     "test:watch": "vitest",
     "smoke": "node tools/smoke.mjs",
     "perf": "node tools/perf.mjs",
-    "assets": "node tools/fetch-assets.mjs"
+    "assets": "node tools/fetch-assets.mjs",
+    "test:features": "node tools/features.mjs",
+    "test:production": "node tools/production-smoke.mjs"
   },
   "keywords": [
     "board-game",
@@ -24,16 +26,20 @@
     "gomoku",
     "spatial-ui"
   ],
-  "author": "",
+  "author": "SSC-STUDIO",
   "license": "MIT",
   "engines": {
-    "node": ">=20"
+    "node": ">=22.12.0"
   },
   "dependencies": {
     "three": "^0.164.0"
   },
   "devDependencies": {
-    "vite": "^5.2.0",
-    "vitest": "^1.6.0"
+    "vite": "^7.3.6",
+    "vitest": "^4.1.11"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SSC-STUDIO/Zenith-Tabletop-3D.git"
   }
 }

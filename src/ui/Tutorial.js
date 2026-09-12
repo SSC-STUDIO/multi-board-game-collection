@@ -23,7 +23,7 @@ export const TUTORIAL_STEPS = Object.freeze([
   {
     id: 'welcome', view: 'MAIN_PLAY', spot: [],
     title: '欢迎来到棋案',
-    text: '这张桌上没有任何按钮——桌上的每一件器物都是一个功能。花一分钟，认识它们。',
+    text: '桌上的器物都可以操作，棋盘前方的铭牌也能选边、暂停、悔棋、复盘和打开设置。花一分钟，认识这张棋案。',
   },
   {
     id: 'opponent', view: 'MAIN_PLAY', spot: ['opponent'],
@@ -58,7 +58,7 @@ export const TUTORIAL_STEPS = Object.freeze([
   {
     id: 'ledger', view: 'LEDGER_REVIEW', spot: ['ledger'], mood: 'study',
     title: '记谱册 · 行棋记录',
-    text: '每一手都会被钢笔记入记谱册。点页角翻页；悬停在某一手上，棋盘会投影出当时局面的残影。',
+    text: '每一手都会被钢笔记入记谱册。点某一手可查看当时局面，也可点铭牌「棋谱」逐手复盘；复盘期间暂停计时，返回后继续对弈。',
   },
   {
     id: 'stamp', view: 'MAIN_PLAY', spot: ['stamp'],
@@ -68,7 +68,7 @@ export const TUTORIAL_STEPS = Object.freeze([
   {
     id: 'camera', view: 'MAIN_PLAY', spot: [],
     title: '镜头与快捷键',
-    text: '按住拖动可环视桌案，滚轮推拉；点击桌面空白处回到主视角。Esc 打开设置，Z 悔棋，H 请教导师，空格暂停。',
+    text: '拖动环视，滚轮或双指缩放；铭牌「俯览」看清棋盘，「设置」打开菜单。Esc 设置，Z 悔棋，H 提示，空格暂停。棋局自动保存，重新打开可继续。',
   },
 ]);
 

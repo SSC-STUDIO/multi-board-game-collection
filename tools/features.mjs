@@ -7,7 +7,7 @@ import { Cdp, ROOT, launchBrowser, sleep, startStaticServer, waitForHttp } from 
 const out = path.join(ROOT, '_tmp_features');
 await fs.mkdir(out, { recursive: true });
 const server = startStaticServer(8125);
-const browser = await launchBrowser({ cdpPort: 9335, width: 1280, height: 900, gpu: true });
+const browser = await launchBrowser({ cdpPort: 9335, width: 1280, height: 900, gpu: !process.env.CI });
 const problems = [];
 let cdp;
 try {
