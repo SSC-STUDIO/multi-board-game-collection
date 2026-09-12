@@ -50,9 +50,9 @@ export const LAYOUT = Object.freeze({
   BOWL_BLACK: Object.freeze({ position: [-8.2, 0, 1.6], radius: 1.0, height: 0.9 }),
   BOWL_WHITE: Object.freeze({ position: [9.0, 0, 3.6], radius: 1.0, height: 0.9 }),
 
-  // Front-centre: vermilion Qingtian-stone victory stamp with its ink box.
-  STAMP: Object.freeze({ position: [-1.0, 0, 7.4], size: 0.9, height: 1.6 }),
-  INK_BOX: Object.freeze({ position: [0.9, 0, 7.4], radius: 0.55, height: 0.35 }),
+  // Front-left: keep the tall stamp outside the sightline to the desk controls.
+  STAMP: Object.freeze({ position: [-5.9, 0, 7.4], size: 0.9, height: 1.6 }),
+  INK_BOX: Object.freeze({ position: [-4.5, 0, 8.0], radius: 0.55, height: 0.35 }),
 
   // The two players. Scale: one unit ≈ 4 cm (the 15×15 grid spans 9.8 units ≈ 40 cm), so a seated
   // adult has hips on the stool seat (y −2.3), shoulders ≈ 12 units higher (world y ≈ 9.7), the head
