@@ -13,6 +13,8 @@
     },
     "models": {
       "chinese_stool": { "res": "1k" },
+      "chinese_armchair": { "res": "1k" },
+      "book_encyclopedia_set_01": { "res": "1k" },
       "chinese_tea_table": { "res": "1k" },
       "tea_set_01": { "res": "1k" },
       "antique_ceramic_vase_01": { "res": "1k" },

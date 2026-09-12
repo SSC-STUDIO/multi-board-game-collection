@@ -130,11 +130,7 @@ export class ZenithApp {
     this.room.setLanternLights(profile.lanternLights);
     this.room.setShellShading(profile.roomShading);
     // Scanned glTF props replace their procedural stand-ins when the download exists.
-    const hasModel = (id) => Boolean(assets?.hasModel(id));
-    this.decor = new TableDecor({
-      audio,
-      features: { stools: !hasModel('chinese_stool'), teaSet: !hasModel('tea_set_01'), bonsai: !hasModel('potted_plant_01') },
-    });
+    this.decor = new TableDecor({ audio });
     // The two players: the opponent across the table and the player's own body, whose eyes are the MAIN_PLAY camera.
     this.tray = new StoneTray({ audio });
     this.opponent = new Figure({ audio, seat: LAYOUT.SEAT_FAR, name: 'opponent', palette: { robe: 0x3c4a6b, sash: 0x8a2b2b } });
@@ -316,15 +312,28 @@ export class ZenithApp {
       this.world.invalidateShadows();
       return group;
     };
+    const hideFallback = (name, model) => {
+      if (model) this.decor.group.traverse(o => { if (o.name === name) o.visible = false; });
+    };
     // Seat tops land at y = −2.3 like the procedural stools, so seated figures stay in place.
-    place(assets.loadModel('chinese_stool', { height: 5.7 }), [0, floorY, 16.5], 0);
-    place(assets.loadModel('chinese_stool', { height: 5.7 }), [0, floorY, -16.5], Math.PI);
+    Promise.all([
+      place(assets.loadModel('chinese_stool', { height: 5.7 }), [0, floorY, 16.5], 0),
+      place(assets.loadModel('chinese_stool', { height: 5.7 }), [0, floorY, -16.5], Math.PI),
+    ]).then(models => { if (models.every(Boolean)) hideFallback('stool', models[0]); });
+    place(assets.loadModel('chinese_armchair', { height: 13 }), [16.5, floorY, -17.8], -0.35);
+    place(assets.loadModel('book_encyclopedia_set_01', {
+      width: 3.8, roll: -Math.PI / 2,
+      nodes: ['book_encyclopedia_set_01_book01', 'book_encyclopedia_set_01_book02', 'book_encyclopedia_set_01_book03'],
+    }), [-12.6, 0, 3.4], -0.1)
+      .then(model => hideFallback('books', model));
     place(assets.loadModel('antique_ceramic_vase_01', { height: 7 }), [-25, floorY, -19], 0.3);
-    place(assets.loadModel('potted_plant_01', { height: 8.5 }), [25.5, floorY, 9], 0.6);
+    place(assets.loadModel('potted_plant_01', { height: 8.5 }), [25.5, floorY, 9], 0.6)
+      .then(model => hideFallback('bonsai', model));
     // Side tea table with the porcelain set resting on its top.
     place(assets.loadModel('chinese_tea_table', { height: 6.5 }), [23.5, floorY, 1.5], Math.PI / 2).then(async (table) => {
       if (!table) return;
-      await place(assets.loadModel('tea_set_01', { width: 3.4 }), [23.5, floorY + table.userData.size.y, 1.5], -0.4);
+      const tea = await place(assets.loadModel('tea_set_01', { width: 3.4 }), [23.5, floorY + table.userData.size.y, 1.5], -0.4);
+      hideFallback('teaSet', tea);
     });
   }
 

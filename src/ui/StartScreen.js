@@ -11,6 +11,7 @@
  * (linked from index.html so the untranspiled sources work without a bundler).
  */
 import { DEFAULT_SETTINGS, SETTING_LABELS, SETTING_OPTIONS, sanitizeSettings } from './Settings.js';
+import { publicUrl } from '../utils/PublicUrl.js';
 
 const HINT_TITLE = '入座后揭开黑罐或白罐选择执子颜色 · 拖动环视桌案 · 滚轮推拉 · 点击桌面空白处回正 · Esc 打开设置';
 const HINT_MENU = '规则与用时在开新对局时生效 · 棋力、画质与音效即时生效 · 再按 Esc 继续对弈';
@@ -51,7 +52,7 @@ export class StartScreen {
     this.root.setAttribute('role', 'dialog');
     this.root.setAttribute('aria-modal', 'true');
     this.root.setAttribute('aria-label', 'Zenith Tabletop 3D 开始');
-    this.root.innerHTML = this._template(logoUrl);
+    this.root.innerHTML = this._template(publicUrl(logoUrl));
     if (importer) this.root.querySelector('.zt-start__import')?.appendChild(importer.root);
 
     this._onClick = this._onClick.bind(this);

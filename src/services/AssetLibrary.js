@@ -13,6 +13,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 import { setCjkFonts } from '../utils/DynamicTexture.js';
+import { publicUrl } from '../utils/PublicUrl.js';
 
 /**
  * @typedef {{ id: string, res: string, diff?: string, nor_gl?: string, arm?: string }} TextureSet
@@ -50,7 +51,7 @@ export class AssetLibrary {
    */
   async init({ timeoutMs = 4000, fonts = true } = {}) {
     try {
-      const res = await fetch(this.manifestUrl, { cache: 'no-cache' });
+      const res = await fetch(publicUrl(this.manifestUrl), { cache: 'no-cache', signal: AbortSignal.timeout(timeoutMs) });
       if (res.ok) this.manifest = await res.json();
     } catch {
       this.manifest = null;
@@ -173,13 +174,13 @@ export class AssetLibrary {
       const img = new Image();
       img.onload = () => resolve(img);
       img.onerror = () => resolve(null);
-      img.src = url;
+      img.src = publicUrl(url);
     });
   }
 
   _texture(url, cacheKey, configure) {
     if (!this._textureCache.has(cacheKey)) {
-      const promise = this._textureLoader.loadAsync(url).then((tex) => {
+      const promise = this._textureLoader.loadAsync(publicUrl(url)).then((tex) => {
         configure(tex);
         return tex;
       }).catch((err) => {
@@ -203,18 +204,22 @@ export class AssetLibrary {
    * @param {{ height?: number, width?: number, castShadow?: boolean, receiveShadow?: boolean, yaw?: number }} [opts]
    * @returns {Promise<THREE.Group | null>} pivot group (base centred at its origin), or null when unavailable
    */
-  async loadModel(id, { height, width, castShadow = true, receiveShadow = true, yaw = 0 } = {}) {
+  async loadModel(id, { height, width, castShadow = true, receiveShadow = true, yaw = 0, roll = 0, nodes = null } = {}) {
     const url = this.manifest?.models?.[id];
     if (!url) return null;
     let gltf;
     try {
-      gltf = await this._gltfLoader.loadAsync(url);
+      gltf = await this._gltfLoader.loadAsync(publicUrl(url));
     } catch (err) {
       console.warn(`[zenith] model failed: ${url}`, err?.message ?? err);
       return null;
     }
     const model = gltf.scene;
+    if (nodes) {
+      for (const child of [...model.children]) if (!nodes.includes(child.name)) model.remove(child);
+    }
     model.rotation.y = yaw;
+    model.rotation.z = roll;
     model.updateMatrixWorld(true);
 
     const box = new THREE.Box3().setFromObject(model);
@@ -261,7 +266,7 @@ export class AssetLibrary {
     const url = this.manifest?.hdris?.[id];
     if (!url) return null;
     try {
-      const tex = await this._rgbeLoader.loadAsync(url);
+      const tex = await this._rgbeLoader.loadAsync(publicUrl(url));
       tex.mapping = THREE.EquirectangularReflectionMapping;
       return tex;
     } catch (err) {
@@ -278,7 +283,7 @@ export class AssetLibrary {
     if (typeof FontFace === 'undefined' || !document.fonts) return;
     const loaded = await Promise.all((this.manifest?.fonts ?? []).map(async (font) => {
       try {
-        const face = new FontFace(font.family, `url(${font.url})`, { display: 'swap' });
+        const face = new FontFace(font.family, `url(${publicUrl(font.url)})`, { display: 'swap' });
         await face.load();
         document.fonts.add(face);
         this.fonts[font.role] = font.family;

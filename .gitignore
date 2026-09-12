@@ -10,6 +10,4 @@ coverage/
 *.tmp
 _tmp*
 
-# Downloaded CC0 / OFL assets (~50 MB). Recreate with `npm run assets`;
-# without them the app falls back to its procedural materials.
-public/assets/
+# Curated CC0 / OFL assets are versioned so clones reproduce the scene offline.

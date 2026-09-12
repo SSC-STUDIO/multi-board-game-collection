@@ -22,6 +22,8 @@ try {
     zenith.pendingTutorial = false; zenith.enterTable(zenith.settings); true`);
   await step(55);
   await sleep(750);
+  assert(await cdp.eval('!!zenith.world.scene.getObjectByName("chinese_armchair")'), 'downloaded armchair loaded');
+  assert.equal(await cdp.eval('zenith.world.scene.getObjectByName("book_encyclopedia_set_01")?.children[0].children.length'), 3);
 
   async function clickAction(id, touch = false) {
     const p = await cdp.eval(`(async () => {

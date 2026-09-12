@@ -1,0 +1,202 @@
+{
+  "generatedAt": "2026-09-12T02:58:38.093Z",
+  "textures": {
+    "table_walnut": {
+      "id": "black_walnut_veneer_01",
+      "res": "2k",
+      "diff": "/assets/textures/table_walnut/black_walnut_veneer_01_diff_2k.jpg",
+      "nor_gl": "/assets/textures/table_walnut/black_walnut_veneer_01_nor_gl_2k.jpg",
+      "arm": "/assets/textures/table_walnut/black_walnut_veneer_01_arm_2k.jpg"
+    },
+    "board_oak": {
+      "id": "red_oak_veneer",
+      "res": "2k",
+      "diff": "/assets/textures/board_oak/red_oak_veneer_diff_2k.jpg",
+      "nor_gl": "/assets/textures/board_oak/red_oak_veneer_nor_gl_2k.jpg",
+      "arm": "/assets/textures/board_oak/red_oak_veneer_arm_2k.jpg"
+    },
+    "floor_planks": {
+      "id": "dark_wooden_planks",
+      "res": "1k",
+      "diff": "/assets/textures/floor_planks/dark_wooden_planks_diff_1k.jpg",
+      "nor_gl": "/assets/textures/floor_planks/dark_wooden_planks_nor_gl_1k.jpg",
+      "arm": "/assets/textures/floor_planks/dark_wooden_planks_arm_1k.jpg"
+    },
+    "wall_plaster": {
+      "id": "plastered_wall_02",
+      "res": "1k",
+      "diff": "/assets/textures/wall_plaster/plastered_wall_02_diff_1k.jpg",
+      "nor_gl": "/assets/textures/wall_plaster/plastered_wall_02_nor_gl_1k.jpg",
+      "arm": "/assets/textures/wall_plaster/plastered_wall_02_arm_1k.jpg"
+    },
+    "rosewood": {
+      "id": "rosewood_veneer1",
+      "res": "1k",
+      "diff": "/assets/textures/rosewood/rosewood_veneer1_diff_1k.jpg",
+      "nor_gl": "/assets/textures/rosewood/rosewood_veneer1_nor_gl_1k.jpg",
+      "arm": "/assets/textures/rosewood/rosewood_veneer1_arm_1k.jpg"
+    },
+    "leather": {
+      "id": "brown_leather",
+      "res": "1k",
+      "diff": "/assets/textures/leather/brown_leather_albedo_1k.jpg",
+      "nor_gl": "/assets/textures/leather/brown_leather_nor_gl_1k.jpg",
+      "arm": "/assets/textures/leather/brown_leather_arm_1k.jpg"
+    },
+    "velvet": {
+      "id": "velour_velvet",
+      "res": "1k",
+      "diff": "/assets/textures/velvet/velour_velvet_diff_1k.jpg",
+      "nor_gl": "/assets/textures/velvet/velour_velvet_nor_gl_1k.jpg",
+      "arm": "/assets/textures/velvet/velour_velvet_arm_1k.jpg"
+    },
+    "hessian": {
+      "id": "hessian_380",
+      "res": "1k",
+      "diff": "/assets/textures/hessian/hessian_380_diff_1k.jpg",
+      "nor_gl": "/assets/textures/hessian/hessian_380_nor_gl_1k.jpg",
+      "arm": "/assets/textures/hessian/hessian_380_arm_1k.jpg"
+    }
+  },
+  "models": {
+    "chinese_stool": "/assets/models/chinese_stool/chinese_stool_1k.gltf",
+    "chinese_armchair": "/assets/models/chinese_armchair/chinese_armchair_1k.gltf",
+    "book_encyclopedia_set_01": "/assets/models/book_encyclopedia_set_01/book_encyclopedia_set_01_1k.gltf",
+    "chinese_tea_table": "/assets/models/chinese_tea_table/chinese_tea_table_1k.gltf",
+    "tea_set_01": "/assets/models/tea_set_01/tea_set_01_1k.gltf",
+    "antique_ceramic_vase_01": "/assets/models/antique_ceramic_vase_01/antique_ceramic_vase_01_1k.gltf",
+    "potted_plant_01": "/assets/models/potted_plant_01/potted_plant_01_1k.gltf"
+  },
+  "hdris": {
+    "fireplace": "/assets/hdri/fireplace_1k.hdr",
+    "pine_attic": "/assets/hdri/pine_attic_1k.hdr"
+  },
+  "fonts": [
+    {
+      "family": "Ma Shan Zheng",
+      "role": "kai",
+      "url": "/assets/fonts/MaShanZheng-Regular.ttf"
+    },
+    {
+      "family": "Zhi Mang Xing",
+      "role": "xing",
+      "url": "/assets/fonts/ZhiMangXing-Regular.ttf"
+    }
+  ],
+  "credits": [
+    {
+      "asset": "black_walnut_veneer_01",
+      "type": "texture",
+      "source": "https://polyhaven.com/a/black_walnut_veneer_01",
+      "license": "CC0"
+    },
+    {
+      "asset": "red_oak_veneer",
+      "type": "texture",
+      "source": "https://polyhaven.com/a/red_oak_veneer",
+      "license": "CC0"
+    },
+    {
+      "asset": "dark_wooden_planks",
+      "type": "texture",
+      "source": "https://polyhaven.com/a/dark_wooden_planks",
+      "license": "CC0"
+    },
+    {
+      "asset": "plastered_wall_02",
+      "type": "texture",
+      "source": "https://polyhaven.com/a/plastered_wall_02",
+      "license": "CC0"
+    },
+    {
+      "asset": "rosewood_veneer1",
+      "type": "texture",
+      "source": "https://polyhaven.com/a/rosewood_veneer1",
+      "license": "CC0"
+    },
+    {
+      "asset": "brown_leather",
+      "type": "texture",
+      "source": "https://polyhaven.com/a/brown_leather",
+      "license": "CC0"
+    },
+    {
+      "asset": "velour_velvet",
+      "type": "texture",
+      "source": "https://polyhaven.com/a/velour_velvet",
+      "license": "CC0"
+    },
+    {
+      "asset": "hessian_380",
+      "type": "texture",
+      "source": "https://polyhaven.com/a/hessian_380",
+      "license": "CC0"
+    },
+    {
+      "asset": "chinese_stool",
+      "type": "model",
+      "source": "https://polyhaven.com/a/chinese_stool",
+      "license": "CC0"
+    },
+    {
+      "asset": "chinese_armchair",
+      "type": "model",
+      "source": "https://polyhaven.com/a/chinese_armchair",
+      "license": "CC0"
+    },
+    {
+      "asset": "book_encyclopedia_set_01",
+      "type": "model",
+      "source": "https://polyhaven.com/a/book_encyclopedia_set_01",
+      "license": "CC0"
+    },
+    {
+      "asset": "chinese_tea_table",
+      "type": "model",
+      "source": "https://polyhaven.com/a/chinese_tea_table",
+      "license": "CC0"
+    },
+    {
+      "asset": "tea_set_01",
+      "type": "model",
+      "source": "https://polyhaven.com/a/tea_set_01",
+      "license": "CC0"
+    },
+    {
+      "asset": "antique_ceramic_vase_01",
+      "type": "model",
+      "source": "https://polyhaven.com/a/antique_ceramic_vase_01",
+      "license": "CC0"
+    },
+    {
+      "asset": "potted_plant_01",
+      "type": "model",
+      "source": "https://polyhaven.com/a/potted_plant_01",
+      "license": "CC0"
+    },
+    {
+      "asset": "fireplace",
+      "type": "hdri",
+      "source": "https://polyhaven.com/a/fireplace",
+      "license": "CC0"
+    },
+    {
+      "asset": "pine_attic",
+      "type": "hdri",
+      "source": "https://polyhaven.com/a/pine_attic",
+      "license": "CC0"
+    },
+    {
+      "asset": "Ma Shan Zheng",
+      "type": "font",
+      "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/mashanzheng/MaShanZheng-Regular.ttf",
+      "license": "OFL-1.1"
+    },
+    {
+      "asset": "Zhi Mang Xing",
+      "type": "font",
+      "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/zhimangxing/ZhiMangXing-Regular.ttf",
+      "license": "OFL-1.1"
+    }
+  ]
+}
