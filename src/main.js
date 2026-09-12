@@ -44,6 +44,7 @@ import { StoneTray } from './spatial/entities/StoneTray.js';
 import { Figure } from './spatial/entities/Figure.js';
 import { Audio3D } from './services/Audio3D.js';
 import { AiService } from './services/AiService.js';
+import { SessionStore } from './services/SessionStore.js';
 import { AssetLibrary } from './services/AssetLibrary.js';
 import { LLMCoachService } from './services/LLMCoachService.js';
 import { StartScreen } from './ui/StartScreen.js';
@@ -192,6 +193,10 @@ export class ZenithApp {
     /** Whether the game was paused by the menu when the tour began (resume afterwards). */
     this.tutorialResume = false;
     this.stats = loadStats();
+    this.sessions = new SessionStore();
+    this.savedSession = this.sessions.load();
+    this.lastSessionSave = 0;
+    this.gameEpoch = 0;
 
     this.importer = new PositionImporter({
       vision: this.llm?.endpoint ? { endpoint: this.llm.endpoint, apiKey: this.llm.apiKey ?? null, model: this.llm.visionModel ?? this.llm.model ?? 'gpt-4o-mini' } : null,
@@ -202,6 +207,8 @@ export class ZenithApp {
       settings,
       importer: this.importer,
       stats: this.stats,
+      savedGame: this.savedSession?.game,
+      onContinueSaved: () => this.resumeSavedGame().catch(console.error),
       onStart: (s) => this.enterTable(s).catch(console.error),
       onResume: (s) => this.closeMenu(s),
       onNewGame: (s) => this.newGameFromMenu(s),
@@ -221,6 +228,7 @@ export class ZenithApp {
       this.engine.on(GameEvent.PAUSE_TOGGLED, (p) => this.onPauseToggled(p)),
       this.engine.on(GameEvent.GAME_FINISHED, (p, _e, s) => this.onGameFinished(p, s).catch(console.error)),
       this.engine.on(GameEvent.INVALID_ACTION, (p) => console.debug('[zenith] rejected action:', p.error)),
+      this.engine.on(GameEvent.STATE_CHANGED, (p) => this.persistSession(p.action.type !== 'TICK')),
       this.world.onBeforeRender((dt) => this.syncClock(dt)),
       this.world.onAfterUpdate((dt, elapsed) => this.updateCameraAndServices(dt, elapsed)),
     ];
@@ -229,6 +237,14 @@ export class ZenithApp {
     this.bindAudioUnlock(canvas);
     this._onKeyDown = (e) => this.onKeyDown(e);
     window.addEventListener('keydown', this._onKeyDown);
+    this._onPageHide = () => this.persistSession(true);
+    this._onVisibilityChange = () => {
+      if (!document.hidden || !this.seated) return;
+      if (this.engine.status === GameStatus.PLAYING && !this.tutorial.active) this.openMenu();
+      this.persistSession(true);
+    };
+    window.addEventListener('pagehide', this._onPageHide);
+    document.addEventListener('visibilitychange', this._onVisibilityChange);
 
     // Title state: slow cinematic sweep behind the settings sheet, table locked.
     this.director.snapTo('TITLE');
@@ -634,6 +650,34 @@ export class ZenithApp {
     this.syncTableConsole();
   }
 
+  persistSession(force = false) {
+    if (this.restoringSession || (!force && now() - this.lastSessionSave < 5000)) return;
+    this.lastSessionSave = now();
+    this.sessions.save(this.engine.getState(), this.elapsedMs);
+  }
+
+  async resumeSavedGame() {
+    if (this.restoringSession || !this.savedSession) return;
+    this.restoringSession = true;
+    const saved = this.savedSession;
+    try {
+      this.applyLiveSettings({ ...this.settings, mode: saved.game.mode, timeMinutes: saved.game.clock.initialMs / 60_000 });
+      const result = this.engine.restoreSession(saved.game, now());
+      if (result.error) return;
+      this.elapsedMs = { ...saved.elapsedMs };
+      this.pendingTutorial = false;
+      this.startScreen.hide();
+      this.hud.clear();
+      await this.director.goTo('MAIN_PLAY', { duration: INTRO_FLIGHT_MS });
+      this.seated = true;
+      this.setInputEnabled(true);
+      this.engine.togglePause(now());
+    } finally {
+      this.restoringSession = false;
+      this.persistSession(true);
+    }
+  }
+
   syncTableConsole() {
     const s = this.engine.getState();
     const selecting = s.status === GameStatus.SELECTING;
@@ -997,6 +1041,8 @@ export class ZenithApp {
   }
 
   onGameReset() {
+    this.gameEpoch++;
+    this.undoBusy = false;
     this.endReview(false);
     this.cancelAi();
     this.cancelCarries();
@@ -1086,6 +1132,7 @@ export class ZenithApp {
   }
 
   async onStateReverted({ undoneMoves }, state) {
+    const epoch = this.gameEpoch;
     this.undoBusy = true;
     this.hintRequest++;
     this.cancelCarries();
@@ -1106,9 +1153,11 @@ export class ZenithApp {
     const flip = this.sandglass.flip();
     const flights = undoneMoves.map(async (move, i) => {
       await sleep(200 + i * 140);
+      if (epoch !== this.gameEpoch) return;
       await this.board.removeStone(move.row, move.col, { flyTo: this.bowls.getBowlPosition(move.player) });
     });
     await Promise.all([flip, ...flights]);
+    if (epoch !== this.gameEpoch) return;
 
     this.undoBusy = false;
     this.sandglass.setEnabled(this.engine.getState().moves.length > 0);
@@ -1260,6 +1309,8 @@ export class ZenithApp {
   dispose() {
     this.cancelAi();
     window.removeEventListener('keydown', this._onKeyDown);
+    window.removeEventListener('pagehide', this._onPageHide);
+    document.removeEventListener('visibilitychange', this._onVisibilityChange);
     for (const off of this.unsubscribers) off();
     this.debugStats?.dispose();
     this.tutorial.dispose();

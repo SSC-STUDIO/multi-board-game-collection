@@ -102,6 +102,10 @@ export class GameEngine {
     return this.dispatch({ type: ActionType.LOAD_POSITION, ...position, timestamp });
   }
 
+  restoreSession(session, timestamp) {
+    return this.dispatch({ type: ActionType.RESTORE_SESSION, session, timestamp });
+  }
+
   get status() {
     return this.#state.status;
   }

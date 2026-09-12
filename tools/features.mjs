@@ -91,8 +91,28 @@ try {
   await sleep(750);
   await step();
   assert.equal(await cdp.eval('document.body.children.length'), 1);
+  // Reload the actual page and continue through the title button, including preserved clocks.
+  await cdp.eval('zenith.openMenu(); zenith.persistSession(true); true');
+  const saved = await cdp.eval('JSON.parse(localStorage.getItem("zenith.session.v1"))');
+  await cdp.send('Page.reload');
+  await sleep(1500);
+  for (let i = 0; i < 80 && !await cdp.eval('!!globalThis.zenith'); i++) await sleep(250);
+  assert(await cdp.eval('!!document.querySelector("[data-action=continue-saved]")'));
+  await cdp.eval(`zenith.world.stop(); zenith.world.clock.getDelta = () => 1/30;
+    document.querySelector('[data-action=continue-saved]').click(); true`);
+  await step(55);
+  await sleep(750);
+  const continued = await cdp.eval(`({ status:zenith.engine.status, moves:zenith.engine.moves.length,
+    human:zenith.engine.getState().humanColor, white:zenith.engine.getState().clock.white,
+    black:zenith.engine.getState().clock.black, dom:document.body.children.length })`);
+  assert.equal(continued.status, 'PLAYING');
+  assert.equal(continued.moves, saved.game.moves.length);
+  assert.equal(continued.human, saved.game.humanColor);
+  assert.equal(continued.white, saved.game.clock.white);
+  assert(continued.black <= saved.game.clock.black && continued.black > saved.game.clock.black - 5000);
+  assert.equal(continued.dom, 1);
   assert.deepEqual(problems, []);
-  console.log('✓ desk mouse/touch controls, frozen review clock, ghost cleanup, cancelled ledger work, phone menu');
+  console.log('✓ desk mouse/touch controls, frozen review clock, ghost cleanup, cancelled ledger work, phone menu, reload and resume');
 } finally {
   cdp?.close();
   await browser.close();

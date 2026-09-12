@@ -17,7 +17,7 @@ export const RuleMode = Object.freeze({ STANDARD: 'STANDARD', RENJU: 'RENJU' });
 export const FinishReason = Object.freeze({ FIVE: 'FIVE', FORBIDDEN: 'FORBIDDEN', RESIGN: 'RESIGN', TIMEOUT: 'TIMEOUT', DRAW: 'DRAW' });
 export const ActionType = Object.freeze({
   SELECT_COLOR: 'SELECT_COLOR', MAKE_MOVE: 'MAKE_MOVE', UNDO_MOVE: 'UNDO_MOVE', TOGGLE_PAUSE: 'TOGGLE_PAUSE',
-  TICK: 'TICK', RESIGN: 'RESIGN', RESET: 'RESET', LOAD_POSITION: 'LOAD_POSITION',
+  TICK: 'TICK', RESIGN: 'RESIGN', RESET: 'RESET', LOAD_POSITION: 'LOAD_POSITION', RESTORE_SESSION: 'RESTORE_SESSION',
 });
 export const GameEvent = Object.freeze({
   MOVE_COMMITTED: 'onMoveCommitted', TURN_SWITCHED: 'onTurnSwitched', STATE_REVERTED: 'onStateReverted',
@@ -155,6 +155,26 @@ function configOf(state) {
   return { mode: state.rules.mode, initialMs: state.clock.initialMs, boardSize: state.boardSize };
 }
 
+/** Validate a local saved game by replaying its moves; never trust a serialized state tree. */
+function prepareSession(session, timestamp) {
+  if (!session || session.version !== 1 || !Object.values(RuleMode).includes(session.mode)
+    || session.boardSize !== BOARD_SIZE || ![BLACK, WHITE].includes(session.humanColor)
+    || ![BLACK, WHITE].includes(session.firstPlayer) || ![BLACK, WHITE].includes(session.currentPlayer)
+    || !Array.isArray(session.moves) || session.moves.length > BOARD_SIZE * BOARD_SIZE) return { error: 'Invalid saved game' };
+  const { initialMs, black, white } = session.clock ?? {};
+  if (!Number.isFinite(initialMs) || initialMs < 0 || initialMs > 86_400_000
+    || ![black, white].every(ms => Number.isFinite(ms) && (initialMs > 0 ? ms > 0 && ms <= initialMs : ms === 0))) {
+    return { error: 'Invalid saved clock' };
+  }
+  const config = { mode: session.mode, boardSize: session.boardSize, initialMs };
+  const loaded = prepareLoadedPosition(config, {
+    board: session.setupBoard, moves: session.moves, currentPlayer: session.firstPlayer,
+  }, timestamp);
+  if (loaded.error) return loaded;
+  if (loaded.currentPlayer !== session.currentPlayer) return { error: 'Saved turn does not match moves' };
+  return { ...loaded, config, clock: { initialMs, black, white, running: false, lastTickTimestamp: timestamp } };
+}
+
 function placeStone(board, row, col, player) {
   const rows = board.slice();
   const cells = board[row].slice();
@@ -204,6 +224,24 @@ function finish(draft, winner, winLine, reason, forbidden = null) {
 }
 
 const HANDLERS = {
+  [ActionType.RESTORE_SESSION]: {
+    validate(_state, action) { return prepareSession(action.session, 0).error; },
+    apply(_state, action, timestamp) {
+      const loaded = prepareSession(action.session, timestamp);
+      const humanColor = action.session.humanColor;
+      const draft = {
+        ...createInitialState(loaded.config), board: loaded.board, setupBoard: loaded.setupBoard,
+        moves: loaded.moves, currentPlayer: loaded.currentPlayer, humanColor, aiColor: opponentOf(humanColor),
+        clock: loaded.clock, status: GameStatus.PAUSED,
+      };
+      return { draft, events: [
+        { type: GameEvent.GAME_RESET, payload: { config: loaded.config } },
+        { type: GameEvent.POSITION_LOADED, payload: { currentPlayer: draft.currentPlayer, counts: countStones(draft.board), moves: draft.moves } },
+        { type: GameEvent.COLOR_SELECTED, payload: { humanColor, aiColor: draft.aiColor } },
+        { type: GameEvent.PAUSE_TOGGLED, payload: { paused: true } },
+      ] };
+    },
+  },
   [ActionType.SELECT_COLOR]: {
     validate(state, action) {
       if (action.color !== BLACK && action.color !== WHITE) return 'Color must be BLACK (1) or WHITE (2)';

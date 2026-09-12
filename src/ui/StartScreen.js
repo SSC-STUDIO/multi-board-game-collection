@@ -33,9 +33,10 @@ export class StartScreen {
   /**
    * @param {{ settings?: Partial<Settings>, logoUrl?: string, importer?: { root: HTMLElement, setActive: (a: boolean) => void, setMode: (m: string) => void, reset: () => void } | null, stats?: Stats | null } & StartScreenCallbacks} options
    */
-  constructor({ settings = {}, logoUrl = '/favicon.svg', importer = null, stats = null, onStart, onResume, onNewGame, onChange, onTutorial, onSave, onResign } = /** @type {any} */ ({})) {
+  constructor({ settings = {}, logoUrl = '/favicon.svg', importer = null, stats = null, savedGame = null, onContinueSaved, onStart, onResume, onNewGame, onChange, onTutorial, onSave, onResign } = /** @type {any} */ ({})) {
     this._settings = sanitizeSettings(settings);
-    this._callbacks = { onStart, onResume, onNewGame, onChange, onTutorial, onSave, onResign };
+    this._callbacks = { onStart, onResume, onNewGame, onChange, onTutorial, onSave, onResign, onContinueSaved };
+    this._savedGame = savedGame;
     this._importer = importer;
     /** @type {ScreenMode} */
     this._mode = 'title';
@@ -221,10 +222,11 @@ export class StartScreen {
       hint.textContent = HINT_MENU;
     } else {
       footer.innerHTML = `
-        <button type="button" class="zt-seal" data-action="start">入座对弈</button>
+        ${this._savedGame ? '<button type="button" class="zt-seal" data-action="continue-saved">继续上次棋局</button>' : ''}
+        <button type="button" class="${this._savedGame ? 'zt-ghost' : 'zt-seal'}" data-action="start">${this._savedGame ? '另开新局' : '入座对弈'}</button>
         <button type="button" class="zt-ghost" data-action="import">复原棋局</button>`;
       secondary.innerHTML = link('tutorial', '新手指导');
-      hint.textContent = HINT_TITLE;
+      hint.textContent = this._savedGame ? `上次已保存 ${this._savedGame.moves.length} 手 · 保留执子、规则和剩余用时 · 离开期间不扣时` : HINT_TITLE;
     }
   }
 
@@ -248,6 +250,9 @@ export class StartScreen {
     }
 
     switch (target.dataset.action) {
+      case 'continue-saved':
+        this._callbacks.onContinueSaved?.();
+        break;
       case 'start':
         this._callbacks.onStart?.(this.settings);
         break;
