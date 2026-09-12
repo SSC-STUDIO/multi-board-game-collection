@@ -15,11 +15,9 @@ try {
   cdp = await Cdp.connect(9335);
   await cdp.collectProblems(problems);
   await cdp.openApp('http://127.0.0.1:8125/?quality=low&depth=2');
-  const step = async (n = 35) => cdp.eval(`(async () => {
-    for (let i = 0; i < ${n}; i++) { zenith.world.render(); await new Promise(r => setTimeout(r, 0)); }
-  })()`);
-  await cdp.eval(`zenith.world.stop(); zenith.world.clock.getDelta = () => 1/30;
-    zenith.pendingTutorial = false; zenith.enterTable(zenith.settings); true`);
+  await cdp.installFrameStepper();
+  const step = (n = 35) => cdp.step(n);
+  await cdp.eval('zenith.pendingTutorial = false; zenith.enterTable(zenith.settings); true');
   await step(55);
   await sleep(750);
   for (let i = 0; i < 80 && !await cdp.eval('!!zenith.player.avatar && !!zenith.opponent.avatar'); i++) await sleep(250);
@@ -113,8 +111,8 @@ try {
   await sleep(1500);
   for (let i = 0; i < 80 && !await cdp.eval('!!globalThis.zenith'); i++) await sleep(250);
   assert(await cdp.eval('!!document.querySelector("[data-action=continue-saved]")'));
-  await cdp.eval(`zenith.world.stop(); zenith.world.clock.getDelta = () => 1/30;
-    document.querySelector('[data-action=continue-saved]').click(); true`);
+  await cdp.installFrameStepper();
+  await cdp.eval("document.querySelector('[data-action=continue-saved]').click(); true");
   await step(55);
   await sleep(750);
   const continued = await cdp.eval(`({ status:zenith.engine.status, moves:zenith.engine.moves.length,

@@ -149,6 +149,32 @@ export class Cdp {
     console.log(`  📷 ${path.relative(ROOT, file)}`);
   }
 
+  /** Advance every simulation frame; software CI draws every eighth frame and each checkpoint. */
+  async installFrameStepper({ dt = 1 / 30, renderStride = process.env.CI ? 8 : 1 } = {}) {
+    await this.eval(`(() => {
+      zenith.world.stop();
+      zenith.world.clock.getDelta = () => ${dt};
+      globalThis.__step = async (n) => {
+        const renderer = zenith.world.renderer;
+        const draw = renderer.render;
+        for (let i = 0; i < n; i++) {
+          const visible = i % ${renderStride} === 0 || i === n - 1;
+          if (!visible) renderer.render = () => {};
+          else if (${renderStride} > 1) renderer.shadowMap.needsUpdate = true;
+          try { zenith.world.render(); }
+          finally { renderer.render = draw; }
+          await new Promise(resolve => setTimeout(resolve, 0));
+        }
+        return zenith.world.frame;
+      };
+      return true;
+    })()`);
+  }
+
+  step(frames) {
+    return this.eval(`__step(${frames})`);
+  }
+
   /**
    * Route page exceptions / console errors into `problems` (and echo them).
    * @param {string[]} problems

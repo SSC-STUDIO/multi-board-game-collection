@@ -11,8 +11,8 @@
  * throws, the render loop stalls or anything but the canvas is in <body>
  * while a game is being played.
  *
- * Runs on SwiftShader (software GL) for determinism, so the harness takes
- * over the frame loop and steps it with a fixed scene dt.
+ * Uses the local GPU, or SwiftShader on CI. The harness steps a fixed scene dt;
+ * software rendering draws every eighth frame plus all assertion checkpoints.
  */
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
@@ -31,7 +31,7 @@ async function main() {
   await fs.mkdir(OUT_DIR, { recursive: true });
 
   const server = startStaticServer(SERVER_PORT);
-  const browser = await launchBrowser({ cdpPort: CDP_PORT, width: WIDTH, height: HEIGHT, gpu: false });
+  const browser = await launchBrowser({ cdpPort: CDP_PORT, width: WIDTH, height: HEIGHT, gpu: !process.env.CI });
 
   const problems = [];
   try {
@@ -66,19 +66,8 @@ async function main() {
 
     // Each stepped frame yields to the event loop (like a real rAF tick) so that
     // timers and promise continuations chained between tweens keep flowing.
-    await cdp.eval(`(() => {
-      zenith.world.stop();
-      zenith.world.clock.getDelta = () => ${FRAME_DT};
-      globalThis.__step = async (n) => {
-        for (let i = 0; i < n; i++) {
-          zenith.world.render();
-          await new Promise((r) => setTimeout(r, 0));
-        }
-        return zenith.world.frame;
-      };
-      return true;
-    })()`);
-    const step = (frames) => cdp.eval(`__step(${frames})`);
+    await cdp.installFrameStepper({ dt: FRAME_DT });
+    const step = (frames) => cdp.step(frames);
     const shot = (name) => cdp.screenshot(path.join(OUT_DIR, name));
 
     await step(20);
@@ -314,7 +303,7 @@ async function main() {
     const frame1 = await cdp.eval('zenith.world.frame');
     const info = await cdp.eval('JSON.stringify(zenith.world.renderer.info.render)');
     const dom = await cdp.eval('document.body.children.length + ":" + Array.from(document.body.children).map(e => e.tagName).join(",")');
-    console.log(`▶ frames rendered: ${frame1 - frame0}, last frame ${info}`);
+    console.log(`▶ simulation frames: ${frame1 - frame0}, last rendered checkpoint ${info}`);
     console.log(`▶ DOM under <body> during play: ${dom}`);
     if (liveFrames < 2) problems.push('render loop never produced a frame on its own');
     if (!/^1:CANVAS$/.test(dom)) problems.push(`zero-2D violated during play: ${dom}`);

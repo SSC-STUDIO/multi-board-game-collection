@@ -33,10 +33,20 @@ try {
   cdp = await Cdp.connect(9336);
   await cdp.collectProblems(problems);
   await cdp.openApp(`http://127.0.0.1:8126${prefix}?quality=low&depth=2`, 60_000);
-  // UI and AI run in the real render loop; the browser receives only the production bundle.
-  await cdp.eval('zenith.pendingTutorial=false; zenith.enterTable(zenith.settings)');
+  // The browser receives only the production bundle. Check its live loop before deterministic stepping.
+  const initialFrame = await cdp.eval('zenith.world.frame');
+  for (let i = 0; i < 80 && await cdp.eval('zenith.world.frame') <= initialFrame; i++) await sleep(250);
+  assert(await cdp.eval('zenith.world.frame') > initialFrame, 'production render loop advances');
+  await cdp.installFrameStepper();
+  await cdp.eval('zenith.pendingTutorial=false; zenith.enterTable(zenith.settings); true');
+  await cdp.step(55);
   await cdp.eval('zenith.onBowlClick(2); true');
-  for (let i=0;i<100 && await cdp.eval('zenith.engine.moves.length < 1 || zenith.carrying.size > 0');i++) await sleep(250);
+  for (let i=0;i<100 && await cdp.eval('zenith.engine.moves.length < 1 || zenith.carrying.size > 0');i++) {
+    await cdp.step(10);
+    await sleep(50);
+  }
+  await sleep(750); // start-screen CSS removal uses wall time
+  await cdp.step(5);
   for (let i=0;i<80 && !await cdp.eval('!!zenith.player.avatar && !!zenith.opponent.avatar');i++) await sleep(250);
   const result = await cdp.eval(`({ title:document.title, moves:zenith.engine.moves.length,
     worker:zenith.ai.offThread, model:!!zenith.world.scene.getObjectByName('chinese_armchair'),
